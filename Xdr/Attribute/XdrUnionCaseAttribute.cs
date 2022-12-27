@@ -3,8 +3,10 @@
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 public class XdrUnionCaseAttribute : XdrUnionArmAttribute
 {
-    public XdrUnionCaseAttribute(int value)
-        : base(value)
+    public XdrUnionCaseAttribute(object value)
     {
+        this.Value = value;
     }
+
+    public object Value { get; }
 }

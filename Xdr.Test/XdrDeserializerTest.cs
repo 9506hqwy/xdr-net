@@ -247,6 +247,7 @@ public class XdrDeserializerTest
     {
         var bytes1 = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
         var v1 = (UnionTest)XdrDeserializer.Deserialize<UnionTest>(bytes1, out var rest1);
+        Assert.AreEqual(1, v1.Value);
         Assert.AreEqual(2, v1!.A!.Data);
         Assert.AreEqual(null, v1.B);
         Assert.AreEqual(null, v1.C);
@@ -254,6 +255,7 @@ public class XdrDeserializerTest
 
         var bytes2 = new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 };
         var v2 = (UnionTest)XdrDeserializer.Deserialize<UnionTest>(bytes2, out var rest2);
+        Assert.AreEqual(2, v2.Value);
         Assert.AreEqual(null, v2!.A);
         Assert.AreEqual(2L, v2.B!.Data);
         Assert.AreEqual(null, v2.C);
@@ -261,6 +263,7 @@ public class XdrDeserializerTest
 
         var bytes3 = new byte[] { 0x00, 0x00, 0x00, 0x03 };
         var v3 = (UnionTest)XdrDeserializer.Deserialize<UnionTest>(bytes3, out var rest3);
+        Assert.AreEqual(3, v3.Value);
         Assert.AreEqual(null, v3!.A);
         Assert.AreEqual(null, v3.B);
         Assert.AreEqual(XdrVoid.Data, v3.C!.Data);
@@ -295,16 +298,20 @@ public class XdrDeserializerTest
         Assert.IsFalse(rest.Any());
     }
 
-    [XdrUnion]
-    private class UnionTest
+    private class UnionTest : XdrUnion<int>
     {
+        public UnionTest(int value)
+            : base(value)
+        {
+        }
+
         [XdrUnionCase(1)]
         public XdrOption<int>? A { get; set; }
 
         [XdrUnionCase(2)]
         public XdrOption<long>? B { get; set; }
 
-        [XdrUnionDefault(3)]
+        [XdrUnionDefault]
         public XdrOption<XdrVoid>? C { get; set; }
     }
 

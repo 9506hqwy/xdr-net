@@ -121,6 +121,12 @@ public static class XdrDeserializer
         {
             return XdrDeserializer.ReadVoid(value, out rest);
         }
+        else if (typeof(IXdrUnion).IsAssignableFrom(type))
+        {
+            // TODO: Find XdrUnion<> type.
+            var valueType = type.BaseType.GenericTypeArguments.First();
+            return XdrDeserializer.ReadUnion<T>(valueType, value, out rest)!;
+        }
         else if (type.IsArray)
         {
             var parameters = new object?[] { value, count, null };
@@ -145,10 +151,6 @@ public static class XdrDeserializer
         else if (type.GetCustomAttributes<XdrStructAttribute>().Any())
         {
             return XdrDeserializer.ReadStruct<T>(value, out rest)!;
-        }
-        else if (type.GetCustomAttributes<XdrUnionAttribute>().Any())
-        {
-            return XdrDeserializer.ReadUnion<T>(value, out rest)!;
         }
 
         throw new NotSupportedException($"Not support type `{type.FullName}`.");
@@ -295,17 +297,23 @@ public static class XdrDeserializer
         return obj;
     }
 
-    private static T ReadUnion<T>(IEnumerable<byte> value, out IEnumerable<byte> rest)
+    private static T ReadUnion<T>(Type valueType, IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var idx = XdrDeserializer.ReadInt(value, out rest);
+        var parameters = new object?[] { value, 0, null };
+        var condition = XdrDeserializer.DeserializeGeneric(
+            nameof(DeserializeInternal),
+            valueType,
+            parameters);
+        rest = (IEnumerable<byte>)parameters[2]!;
 
-        var obj = Activator.CreateInstance<T>()!;
+        var obj = (T)Activator.CreateInstance(typeof(T), condition)!;
 
-        var property = Utility.GetXdrUnionElement(obj).FirstOrDefault(p => Utility.MatchXdrUnionArm(p, idx));
+        var property = Utility.GetXdrUnionElement(obj)
+            .FirstOrDefault(p => Utility.MatchXdrUnionArm(p, condition));
         property ??= Utility.GetXdrUnionDefault(obj);
 
         var len = Utility.GetXdrFixedLength(property);
-        var parameters = new object?[] { rest, len, null };
+        parameters = new object?[] { rest, len, null };
         var propType = property.PropertyType.GenericTypeArguments.First();
         var data = XdrDeserializer.DeserializeGeneric(
             nameof(DeserializeInternal),

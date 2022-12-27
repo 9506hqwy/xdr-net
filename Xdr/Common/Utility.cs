@@ -42,7 +42,7 @@ internal static class Utility
 
     internal static PropertyInfo[] GetXdrUnionElement(object value)
     {
-        var elements = new Dictionary<int, PropertyInfo>();
+        var elements = new Dictionary<object, PropertyInfo>();
 
         foreach (var property in value.GetType().GetProperties())
         {
@@ -68,9 +68,9 @@ internal static class Utility
         return prop.IsDefined(typeof(XdrUnionDefaultAttribute), true);
     }
 
-    internal static bool MatchXdrUnionArm(PropertyInfo prop, int value)
+    internal static bool MatchXdrUnionArm(PropertyInfo prop, object value)
     {
-        var attr = prop.GetCustomAttribute<XdrUnionArmAttribute>();
-        return attr != null && attr.Value == value;
+        var attr = prop.GetCustomAttribute<XdrUnionCaseAttribute>();
+        return attr != null && attr.Value.Equals(value);
     }
 }

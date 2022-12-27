@@ -181,21 +181,21 @@ public class XdrSerializerTest
     [TestMethod]
     public void SerializeUnion()
     {
-        var obj1 = new UnionTest
+        var obj1 = new UnionTest(1)
         {
             A = new XdrOption<int>(2),
         };
         var v1 = XdrSerializer.Serialize(obj1);
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v1);
 
-        var obj2 = new UnionTest
+        var obj2 = new UnionTest(2)
         {
             B = new XdrOption<long>(2),
         };
         var v2 = XdrSerializer.Serialize(obj2);
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 }, v2);
 
-        var obj3 = new UnionTest
+        var obj3 = new UnionTest(3)
         {
             C = new XdrOption<XdrVoid>(XdrVoid.Data),
         };
@@ -237,16 +237,20 @@ public class XdrSerializerTest
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
     }
 
-    [XdrUnion]
-    private class UnionTest
+    private class UnionTest : XdrUnion<int>
     {
+        public UnionTest(int value)
+            : base(value)
+        {
+        }
+
         [XdrUnionCase(1)]
         public XdrOption<int>? A { get; set; }
 
         [XdrUnionCase(2)]
         public XdrOption<long>? B { get; set; }
 
-        [XdrUnionDefault(3)]
+        [XdrUnionDefault]
         public XdrOption<XdrVoid>? C { get; set; }
     }
 

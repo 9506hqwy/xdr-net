@@ -7,7 +7,7 @@ and stub code generation tool from interface defined file.
 
 ```csharp
 var bytes = XdrSerializer.Serialize(1);
-var va = XdrDeserializer.Deserialize<int>(bytes);
+var val = XdrDeserializer.Deserialize<int>(bytes);
 ```
 
 ## Data Types
@@ -28,7 +28,7 @@ var va = XdrDeserializer.Deserialize<int>(bytes);
 | Fixed-Length Arary          | T[] [^1]                                       |
 | Variable-Length Array       | IList\<T>                                      |
 | Structure                   | class                                          |
-| Discriminated Union         | class                                          |
+| Discriminated Union         | XdrUnion\<T>                                   |
 | Void                        | XdrVoid                                        |
 | Optional-Data               | XdrOption\<T>                                  |
 
@@ -88,9 +88,13 @@ case EXEC:
 ```
 
 ```csharp
-[Xdr.XdrUnion]
-class FileType
+class FileType : XdrUnion<int>
 {
+    public FileType(int value)
+        : base(value)
+    {
+    }
+
     [Xdr.XdrUnionCase(0)]
     public XdrOption<XdrVoid>? Void { get; set; }
 

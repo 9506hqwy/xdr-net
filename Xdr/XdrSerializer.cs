@@ -112,6 +112,18 @@ public static class XdrSerializer
         return Array.Empty<byte>();
     }
 
+    public static byte[] Serialize(IXdrUnion value)
+    {
+        var bytes = XdrSerializer.Serialize(value.Data);
+
+        var property = Utility.GetXdrUnionElement(value)
+            .FirstOrDefault(p => Utility.MatchXdrUnionArm(p, value.Data));
+        property ??= Utility.GetXdrUnionDefault(value);
+
+        var propValue = property.GetValue(value) as IXdrOption;
+        return bytes.Concat(XdrSerializer.Serialize(propValue!.Data)).ToArray();
+    }
+
     public static byte[] Serialize(object? value)
     {
         if (value is null)
@@ -142,6 +154,7 @@ public static class XdrSerializer
             case IList<byte> v: return XdrSerializer.Serialize(v);
             case IXdrOption v: return XdrSerializer.Serialize(v);
             case XdrVoid v: return XdrSerializer.Serialize(v);
+            case IXdrUnion v: return XdrSerializer.Serialize(v);
             default: break;
         }
 
@@ -164,11 +177,6 @@ public static class XdrSerializer
         if (type.GetCustomAttributes<XdrStructAttribute>().Any())
         {
             return XdrSerializer.SerializeStruct(value);
-        }
-
-        if (type.GetCustomAttributes<XdrUnionAttribute>().Any())
-        {
-            return XdrSerializer.SerializeUnion(value);
         }
 
         throw new NotSupportedException($"Not support type `{type.FullName}`.");
@@ -205,34 +213,6 @@ public static class XdrSerializer
             .Select(p => p.GetValue(value))
             .SelectMany(XdrSerializer.Serialize)
             .ToArray();
-    }
-
-    private static byte[] SerializeUnion(object value)
-    {
-        foreach (var property in Utility.GetXdrUnionElement(value))
-        {
-            var v = property.GetValue(value);
-            if (v is null)
-            {
-                continue;
-            }
-
-            return XdrSerializer.SerializeUnionValue<XdrUnionCaseAttribute>(value, property);
-        }
-
-        var defaultProperty = Utility.GetXdrUnionDefault(value);
-        return XdrSerializer.SerializeUnionValue<XdrUnionDefaultAttribute>(value, defaultProperty);
-    }
-
-    private static byte[] SerializeUnionValue<T>(object value, PropertyInfo property)
-        where T : XdrUnionArmAttribute
-    {
-        var propValue = property.GetValue(value) as IXdrOption;
-
-        var attr = property.GetCustomAttribute<T>();
-        var bytes = XdrSerializer.Serialize(attr.Value);
-
-        return bytes.Concat(XdrSerializer.Serialize(propValue!.Data)).ToArray();
     }
 
     private static byte[] SerializeVariableArray<T>(IList<T> value)
