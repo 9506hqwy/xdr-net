@@ -46,7 +46,7 @@ internal static class Utility
 
         foreach (var property in value.GetType().GetProperties())
         {
-            var attr = property.GetCustomAttribute<XdrUnionCaseAttribute>();
+            var attr = property.GetCustomAttributes<XdrUnionCaseAttribute>().FirstOrDefault();
             if (attr is null)
             {
                 continue;
@@ -70,7 +70,6 @@ internal static class Utility
 
     internal static bool MatchXdrUnionArm(PropertyInfo prop, object value)
     {
-        var attr = prop.GetCustomAttribute<XdrUnionCaseAttribute>();
-        return attr != null && attr.Value.Equals(value);
+        return prop.GetCustomAttributes<XdrUnionCaseAttribute>().Any(a => a.Value.Equals(value));
     }
 }
