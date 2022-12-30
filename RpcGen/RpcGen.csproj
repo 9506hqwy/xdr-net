@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>rpc-gen</ToolCommandName>
+    <AssemblyName>rpc-gen</AssemblyName>
+    <TargetFramework>net7.0</TargetFramework>
+    <Version>0.1.0.0</Version>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>9506hqwy</Authors>
+    <Copyright>Copyright (c) 2022 9506hqwy. All Rights Reserved.</Copyright>
+    <Description>This binary is code generator tool for Xdr library.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/9506hqwy/xdr-net</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageVersion>0.1.0</PackageVersion>
+    <RepositoryUrl>https://github.com/9506hqwy/xdr-net</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.CodeDom" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xdr\Xdr.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md"  Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
