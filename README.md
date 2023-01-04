@@ -109,7 +109,7 @@ class FileType : XdrUnion<int>
 ## Stub Code Generation
 
 ```sh
-rpcgen <PATH>
+dotnet rpc-gen <PATH>
 ```
 
 PATH is interface defined file path.
