@@ -213,7 +213,10 @@ public class Generator
 
     private void AddClassToNs(CodeNamespace ns, StructDef structd)
     {
-        var cls = new CodeTypeDeclaration(Utility.ToClassName(structd.Identifier.Value));
+        var cls = new CodeTypeDeclaration(Utility.ToClassName(structd.Identifier.Value))
+        {
+            IsPartial = true,
+        };
         cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(XdrStructAttribute).FullName!));
 
         for (int i = 0; i < structd.Body.Count; i++)
@@ -231,7 +234,10 @@ public class Generator
         var xdrUnionType = new CodeTypeReference(typeof(XdrUnion<>));
         xdrUnionType.TypeArguments.Add(conitionType);
 
-        var cls = new CodeTypeDeclaration(Utility.ToClassName(uniond.Identifier.Value));
+        var cls = new CodeTypeDeclaration(Utility.ToClassName(uniond.Identifier.Value))
+        {
+            IsPartial = true,
+        };
         cls.BaseTypes.Add(xdrUnionType);
 
         var ctor = new CodeConstructor();
