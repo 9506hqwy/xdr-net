@@ -1,5 +1,6 @@
 ﻿namespace Xdr;
 
+[Serializable]
 public sealed class XdrVoid
 {
     private XdrVoid()

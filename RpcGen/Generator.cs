@@ -196,6 +196,7 @@ public class Generator
         {
             IsEnum = true,
         };
+        cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(System.SerializableAttribute).FullName!));
 
         foreach ((var field, var value) in enumd.Body)
         {
@@ -217,6 +218,7 @@ public class Generator
         {
             IsPartial = true,
         };
+        cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(System.SerializableAttribute).FullName!));
         cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(XdrStructAttribute).FullName!));
 
         for (int i = 0; i < structd.Body.Count; i++)
@@ -238,6 +240,7 @@ public class Generator
         {
             IsPartial = true,
         };
+        cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(System.SerializableAttribute).FullName!));
         cls.BaseTypes.Add(xdrUnionType);
 
         var ctor = new CodeConstructor();

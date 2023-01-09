@@ -5,6 +5,7 @@ public interface IXdrOption
     object Data { get; }
 }
 
+[Serializable]
 public class XdrOption<T> : IXdrOption
 {
     public XdrOption(T value)

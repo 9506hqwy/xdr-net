@@ -5,6 +5,7 @@ public interface IXdrUnion
     object Data { get; }
 }
 
+[Serializable]
 public abstract class XdrUnion<T> : IXdrUnion
 {
     public XdrUnion(T value)
