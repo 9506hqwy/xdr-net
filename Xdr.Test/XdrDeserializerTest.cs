@@ -306,6 +306,20 @@ public class XdrDeserializerTest
         Assert.IsFalse(rest.Any());
     }
 
+    [TestMethod]
+    public void DeserializeStructXdrOption()
+    {
+        var bytes1 = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+        var v1 = (StructXdrOptionTest)XdrDeserializer.Deserialize<StructXdrOptionTest>(bytes1, out var rest1);
+        Assert.IsNull(v1.A);
+        Assert.IsFalse(rest1.Any());
+
+        var bytes2 = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
+        var v2 = (StructXdrOptionTest)XdrDeserializer.Deserialize<StructXdrOptionTest>(bytes2, out var rest2);
+        Assert.AreEqual(2, v2.A!.Value);
+        Assert.IsFalse(rest2.Any());
+    }
+
     private class UnionTest : XdrUnion<int>
     {
         public UnionTest(int value)
@@ -347,5 +361,12 @@ public class XdrDeserializerTest
     {
         [XdrElementOrder(1)]
         public List<int> A { get; set; } = new List<int>();
+    }
+
+    [XdrStruct]
+    private class StructXdrOptionTest
+    {
+        [XdrElementOrder(1)]
+        public XdrOption<int>? A { get; set; }
     }
 }

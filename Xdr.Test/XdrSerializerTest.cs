@@ -244,6 +244,24 @@ public class XdrSerializerTest
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
     }
 
+    [TestMethod]
+    public void SerializeStructXdrOption()
+    {
+        var obj1 = new StructXdrOptionTest
+        {
+            A = null,
+        };
+        var v1 = XdrSerializer.Serialize(obj1);
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x00 }, v1);
+
+        var obj2 = new StructXdrOptionTest
+        {
+            A = new XdrOption<int>(2),
+        };
+        var v2 = XdrSerializer.Serialize(obj2);
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v2);
+    }
+
     private class UnionTest : XdrUnion<int>
     {
         public UnionTest(int value)
@@ -285,5 +303,12 @@ public class XdrSerializerTest
     {
         [XdrElementOrder(1)]
         public List<int> A { get; set; } = new List<int>();
+    }
+
+    [XdrStruct]
+    private class StructXdrOptionTest
+    {
+        [XdrElementOrder(1)]
+        public XdrOption<int>? A { get; set; }
     }
 }

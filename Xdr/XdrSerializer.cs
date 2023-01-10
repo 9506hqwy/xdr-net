@@ -210,9 +210,23 @@ public static class XdrSerializer
     private static byte[] SerializeStruct(object value)
     {
         return Utility.GetXdrStructElement(value)
-            .Select(p => p.GetValue(value))
-            .SelectMany(XdrSerializer.Serialize)
+            .SelectMany(p => XdrSerializer.SerializeStructElement(p, value))
             .ToArray();
+    }
+
+    private static byte[] SerializeStructElement(PropertyInfo property, object obj)
+    {
+        var value = property.GetValue(obj);
+
+        if (typeof(IXdrOption).IsAssignableFrom(property.PropertyType))
+        {
+            var option = (IXdrOption)value;
+            return XdrSerializer.Serialize(option);
+        }
+        else
+        {
+            return XdrSerializer.Serialize(value);
+        }
     }
 
     private static byte[] SerializeVariableArray<T>(IList<T> value)
