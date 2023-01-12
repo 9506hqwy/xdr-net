@@ -182,6 +182,19 @@ public static class XdrSerializer
         throw new NotSupportedException($"Not support type `{type.FullName}`.");
     }
 
+    private static byte[] Serialize(Type type, object value)
+    {
+        if (typeof(IXdrOption).IsAssignableFrom(type))
+        {
+            var option = (IXdrOption)value;
+            return XdrSerializer.Serialize(option);
+        }
+        else
+        {
+            return XdrSerializer.Serialize(value);
+        }
+    }
+
     private static byte[] SerializeEnumerate(IEnumerable<byte> value, bool prefixLength)
     {
         int len = value.Count();
@@ -203,7 +216,7 @@ public static class XdrSerializer
     {
         return value
             .Cast<object>()
-            .SelectMany(XdrSerializer.Serialize)
+            .SelectMany(o => XdrSerializer.Serialize(typeof(T), o))
             .ToArray();
     }
 
@@ -217,16 +230,7 @@ public static class XdrSerializer
     private static byte[] SerializeStructElement(PropertyInfo property, object obj)
     {
         var value = property.GetValue(obj);
-
-        if (typeof(IXdrOption).IsAssignableFrom(property.PropertyType))
-        {
-            var option = (IXdrOption)value;
-            return XdrSerializer.Serialize(option);
-        }
-        else
-        {
-            return XdrSerializer.Serialize(value);
-        }
+        return XdrSerializer.Serialize(property.PropertyType, value);
     }
 
     private static byte[] SerializeVariableArray<T>(IList<T> value)
@@ -236,7 +240,7 @@ public static class XdrSerializer
         var bytes = XdrSerializer.Serialize(len);
         var arr = value
             .Cast<object>()
-            .SelectMany(XdrSerializer.Serialize)
+            .SelectMany(o => XdrSerializer.Serialize(typeof(T), o))
             .ToArray();
 
         return bytes.Concat(arr).ToArray();

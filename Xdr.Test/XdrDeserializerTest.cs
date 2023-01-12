@@ -167,6 +167,11 @@ public class XdrDeserializerTest
         var v3 = XdrDeserializer.Deserialize<string>(bytes3, out var rest3);
         Assert.AreEqual("abcd", v3);
         Assert.IsFalse(rest3.Any());
+
+        var bytes4 = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+        var v4 = XdrDeserializer.Deserialize<string>(bytes4, out var rest4);
+        Assert.AreEqual(string.Empty, v4);
+        Assert.IsFalse(rest4.Any());
     }
 
     [TestMethod]
@@ -179,11 +184,31 @@ public class XdrDeserializerTest
     }
 
     [TestMethod]
+    public void DeserializeFixedXdrOption()
+    {
+        var bytes = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
+        var v = (XdrOption<int>[])XdrDeserializer.Deserialize<XdrOption<int>?[]>(bytes, 2, out var rest);
+        Assert.IsNull(v[0]);
+        Assert.AreEqual(2, v[1].Value);
+        Assert.IsFalse(rest.Any());
+    }
+
+    [TestMethod]
     public void DeserializeVariableOpaque()
     {
         var bytes = new byte[] { 0x00, 0x00, 0x00, 0x02, 0x01, 0x02, 0x00, 0x00 };
         var v = (List<byte>)XdrDeserializer.Deserialize<List<byte>>(bytes, out var rest);
         CollectionAssert.AreEqual(new List<byte> { 1, 2 }, v);
+        Assert.IsFalse(rest.Any());
+    }
+
+    [TestMethod]
+    public void DeserializeVariableXdrOption()
+    {
+        var bytes = new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
+        var v = (List<XdrOption<int>>)XdrDeserializer.Deserialize<List<XdrOption<int>?>>(bytes, out var rest);
+        Assert.IsNull(v[0]);
+        Assert.AreEqual(2, v[1].Value);
         Assert.IsFalse(rest.Any());
     }
 

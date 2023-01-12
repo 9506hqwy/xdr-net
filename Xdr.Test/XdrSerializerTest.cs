@@ -119,6 +119,9 @@ public class XdrSerializerTest
 
         var v3 = XdrSerializer.Serialize("abcd");
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x04, 0x61, 0x62, 0x63, 0x64 }, v3);
+
+        var v4 = XdrSerializer.Serialize(string.Empty);
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x00 }, v4);
     }
 
     [TestMethod]
@@ -129,10 +132,24 @@ public class XdrSerializerTest
     }
 
     [TestMethod]
+    public void SerializeFixedXdrOption()
+    {
+        var v = XdrSerializer.Serialize(new XdrOption<int>?[] { null, new XdrOption<int>(2) });
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
+    }
+
+    [TestMethod]
     public void SerializeVariableOpaque()
     {
         var v = XdrSerializer.Serialize(new List<byte> { 1, 2 });
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x02, 0x01, 0x02, 0x00, 0x00 }, v);
+    }
+
+    [TestMethod]
+    public void SerializeVariableXdrOption()
+    {
+        var v = XdrSerializer.Serialize(new List<XdrOption<int>?> { null, new XdrOption<int>(2) });
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
     }
 
     [TestMethod]
