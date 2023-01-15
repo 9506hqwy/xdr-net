@@ -98,6 +98,10 @@ public static class XdrDeserializer
         {
             return XdrDeserializer.ReadString(value, out rest);
         }
+        else if (type == typeof(byte))
+        {
+            return XdrDeserializer.ReadByte(value, out rest);
+        }
         else if (type == typeof(byte[]))
         {
             return XdrDeserializer.ReadBytes(value, count, out rest);
@@ -228,6 +232,13 @@ public static class XdrDeserializer
     {
         var bytes = XdrDeserializer.ReadVariableBytes(value, out rest);
         return Encoding.UTF8.GetString(bytes);
+    }
+
+    private static byte ReadByte(IEnumerable<byte> value, out IEnumerable<byte> rest)
+    {
+        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        Array.Reverse(bytes);
+        return bytes[0];
     }
 
     private static byte[] ReadBytes(IEnumerable<byte> value, int count, out IEnumerable<byte> rest)

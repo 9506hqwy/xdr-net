@@ -20,6 +20,19 @@ public class XdrSerializerTest
     }
 
     [TestMethod]
+    public void SerializeByte()
+    {
+        var v1 = XdrSerializer.Serialize((byte)0x00);
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x00 }, v1);
+
+        var v2 = XdrSerializer.Serialize((byte)0x01);
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x01 }, v2);
+
+        var v3 = XdrSerializer.Serialize((byte)0xFF);
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0xFF }, v3);
+    }
+
+    [TestMethod]
     public void SerializeShort()
     {
         var v1 = XdrSerializer.Serialize((short)0);
