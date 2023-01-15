@@ -114,6 +114,10 @@ dotnet rpc-gen <PATH>
 
 PATH is interface defined file path.
 
+## Examples
+
+- [libvirt-remote-net](https://github.com/9506hqwy/libvirt-remote-net)
+
 ## References
 
 - [XDR: External Data Representation Standard](https://www.rfc-editor.org/rfc/rfc4506.txt)
