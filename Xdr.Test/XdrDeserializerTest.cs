@@ -43,6 +43,20 @@ public class XdrDeserializerTest
     }
 
     [TestMethod]
+    public void DeserializeChar()
+    {
+        var bytes1 = new byte[] { 0x00, 0x00, 0x00, 0x61 };
+        var v1 = XdrDeserializer.Deserialize<char>(bytes1, out var rest1);
+        Assert.AreEqual('a', v1);
+        Assert.IsFalse(rest1.Any());
+
+        var bytes2 = new byte[] { 0x00, 0x00, 0x30, 0x42 };
+        var v2 = XdrDeserializer.Deserialize<char>(bytes2, out var rest2);
+        Assert.AreEqual('あ', v2);
+        Assert.IsFalse(rest2.Any());
+    }
+
+    [TestMethod]
     public void DeserializeShort()
     {
         var bytes1 = new byte[] { 0x00, 0x00, 0x00, 0x00 };

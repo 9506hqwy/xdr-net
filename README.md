@@ -15,7 +15,7 @@ var val = XdrDeserializer.Deserialize<int>(bytes);
 | XDR                         | C#                                             |
 | --------------------------- | ---------------------------------------------- |
 | Integer                     | short, int                                     |
-| Unsigned Integer            | ushort, uint, bool, byte                       |
+| Unsigned Integer            | ushort, uint, bool, byte, char                 |
 | Enumeration                 | enum                                           |
 | Hyper Integer               | long                                           |
 | Unsigned Hyper Integer      | ulong                                          |

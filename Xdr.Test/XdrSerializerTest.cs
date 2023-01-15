@@ -33,6 +33,16 @@ public class XdrSerializerTest
     }
 
     [TestMethod]
+    public void SerializeChar()
+    {
+        var v1 = XdrSerializer.Serialize('a');
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x61 }, v1);
+
+        var v2 = XdrSerializer.Serialize('あ');
+        CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x30, 0x42 }, v2);
+    }
+
+    [TestMethod]
     public void SerializeShort()
     {
         var v1 = XdrSerializer.Serialize((short)0);
