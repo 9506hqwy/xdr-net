@@ -83,8 +83,8 @@ internal static class TokenUtility
             "string" => typeof(string),
 
             // libvirt extension
-            "unsigned char" => typeof(byte),
-            "char" => typeof(byte),
+            "unsigned char" => typeof(uint),
+            "char" => typeof(int),
             "unsigned short" => typeof(ushort),
             "short" => typeof(short),
 
