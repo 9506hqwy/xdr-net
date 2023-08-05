@@ -11,12 +11,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -c Release
+
     - name: Package
-      run: dotnet pack -c Release -o ./artifacts
+      run: dotnet pack --no-build -c Release -o ./artifacts
+
     - name: Create Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        find ./artifacts -type f
         gh config set prompt disabled
         gh release create ${GITHUB_REF_NAME} ./artifacts/*  -t v${GITHUB_REF_NAME} -d
