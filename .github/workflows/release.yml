@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    tags: [ '*' ]
+    tags: [ '**' ]
 
 jobs:
   release:
@@ -10,15 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Restore dependencies
+    - name: Restore Dependencies
       run: dotnet restore
 
-    - name: Build
+    - name: Build Release
       run: dotnet build --no-restore -c Release
 
-    - name: Package
+    - name: Create Artifacts
       run: dotnet pack --no-build -c Release -o ./artifacts
 
     - name: Create Release

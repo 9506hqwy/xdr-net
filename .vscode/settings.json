@@ -1,0 +1,5 @@
+{
+    "coverage-gutters.showLineCoverage": true,
+    "dotnet.defaultSolution": "xdr-net.sln",
+    "editor.codeLens": false
+}
