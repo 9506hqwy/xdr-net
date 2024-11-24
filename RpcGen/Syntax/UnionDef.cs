@@ -1,40 +1,34 @@
 ﻿namespace RpcGen;
 
-public class UnionDef : IDefinition
+public class UnionDef(
+    IdentifierToken identifier,
+    Declaration condition,
+    IList<CaseSpec> cases,
+    Declaration? defaultValue) : IDefinition
 {
-    public UnionDef(
-        IdentifierToken identifier,
-        Declaration condition,
-        IList<CaseSpec> cases,
-        Declaration? defaultValue)
-    {
-        this.Identifier = identifier;
-        this.Condition = condition;
-        this.Cases = cases;
-        this.DefaultValue = defaultValue;
-    }
+    public IList<CaseSpec> Cases { get; } = cases;
 
-    public IList<CaseSpec> Cases { get; }
+    public Declaration Condition { get; } = condition;
 
-    public Declaration Condition { get; }
+    public Declaration? DefaultValue { get; } = defaultValue;
 
-    public Declaration? DefaultValue { get; }
-
-    public IdentifierToken Identifier { get; }
+    public IdentifierToken Identifier { get; } = identifier;
 
     public static UnionDef Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         var identifier = reader.ExpectIdentifier();
 
-        reader.ExpectSwitch();
+        _ = reader.ExpectSwitch();
 
-        reader.ExpectParenStart();
+        _ = reader.ExpectParenStart();
 
         var condition = Declaration.Take(reader);
 
-        reader.ExpectParenEnd();
+        _ = reader.ExpectParenEnd();
 
-        reader.ExpectBraceStart();
+        _ = reader.ExpectBraceStart();
 
         var cases = new List<CaseSpec>();
         while (reader.IsCase())
@@ -44,18 +38,18 @@ public class UnionDef : IDefinition
         }
 
         Declaration? defaultValue = null;
-        if (reader.TryExpectDefault(out var _))
+        if (reader.TryExpectDefault(out _))
         {
-            reader.ExpectColon();
+            _ = reader.ExpectColon();
 
             defaultValue = Declaration.Take(reader);
 
-            reader.ExpectSemicolon();
+            _ = reader.ExpectSemicolon();
         }
 
-        reader.ExpectBraceEnd();
+        _ = reader.ExpectBraceEnd();
 
-        reader.ExpectSemicolon();
+        _ = reader.ExpectSemicolon();
 
         return new UnionDef(identifier, condition, cases, defaultValue);
     }

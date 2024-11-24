@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "dotnettools.vscodeintellicode-csharp",
+        "editorconfig.editorconfig",
+        "ms-dotnettools.csdevkit",
+        "ms-vscode-remote.remote-containers"
+    ]
+}

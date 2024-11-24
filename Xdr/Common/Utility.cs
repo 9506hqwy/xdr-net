@@ -37,7 +37,7 @@ internal static class Utility
             elements.Add(attr.Order, property);
         }
 
-        return elements.Values.ToArray();
+        return [.. elements.Values];
     }
 
     internal static PropertyInfo[] GetXdrUnionElement(object value)
@@ -60,7 +60,7 @@ internal static class Utility
             elements.Add(attr.Value, property);
         }
 
-        return elements.Values.ToArray();
+        return [.. elements.Values];
     }
 
     internal static bool IsXdrDefault(PropertyInfo prop)

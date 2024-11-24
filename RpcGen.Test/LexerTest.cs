@@ -9,7 +9,7 @@ public class LexerTest
     public void EnumerateCommentBlock()
     {
         string content = "/* a */";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is CommentToken);
         Assert.AreEqual(" a ", token.Value);
     }
@@ -18,12 +18,12 @@ public class LexerTest
     public void EnumerateCommentLine()
     {
         string content = "% a";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is CommentToken);
         Assert.AreEqual(" a", token.Value);
 
         content = "% a\n";
-        var tokens = this.ParseToken(content);
+        var tokens = ParseToken(content);
         Assert.IsTrue(tokens[0] is CommentToken);
         Assert.IsTrue(tokens[1] is WhitespaceToken);
         Assert.AreEqual(" a", tokens[0].Value);
@@ -34,7 +34,7 @@ public class LexerTest
     public void EnumerateWhitespace()
     {
         string content = " \t\r\n";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is WhitespaceToken);
     }
 
@@ -42,7 +42,7 @@ public class LexerTest
     public void EnumerateSeparator()
     {
         string content = "}{][)(><,=;:";
-        var tokens = this.ParseToken(content).OfType<SeparatorToken>().ToArray();
+        var tokens = ParseToken(content).OfType<SeparatorToken>().ToArray();
         Assert.AreEqual(SeparatorType.BraceEnd, tokens[0].Type);
         Assert.AreEqual(SeparatorType.BraceStart, tokens[1].Type);
         Assert.AreEqual(SeparatorType.BracketEnd, tokens[2].Type);
@@ -61,7 +61,7 @@ public class LexerTest
     public void EnumerateHexadecimal()
     {
         string content = "0x1";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is HexadecimalToken);
         Assert.AreEqual("0x1", token.Value);
     }
@@ -70,7 +70,7 @@ public class LexerTest
     public void EnumerateOctal()
     {
         string content = "01";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is OctalToken);
         Assert.AreEqual("01", token.Value);
     }
@@ -79,17 +79,17 @@ public class LexerTest
     public void EnumerateDecimal()
     {
         string content = "0";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is DecimalToken);
         Assert.AreEqual("0", token.Value);
 
         content = "1";
-        token = this.ParseToken(content).Single();
+        token = ParseToken(content).Single();
         Assert.IsTrue(token is DecimalToken);
         Assert.AreEqual("1", token.Value);
 
         content = "-1";
-        token = this.ParseToken(content).Single();
+        token = ParseToken(content).Single();
         Assert.IsTrue(token is DecimalToken);
         Assert.AreEqual("-1", token.Value);
     }
@@ -98,7 +98,7 @@ public class LexerTest
     public void EnumeratIdentifier()
     {
         string content = "a";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is IdentifierToken);
         Assert.AreEqual("a", token.Value);
     }
@@ -107,20 +107,20 @@ public class LexerTest
     public void EnumeratUnknown()
     {
         string content = "0a";
-        var token = this.ParseToken(content).Single();
+        var token = ParseToken(content).Single();
         Assert.IsTrue(token is UnknownToken);
         Assert.AreEqual("0a", token.Value);
     }
 
-    private Token[] ParseToken(string content)
+    private static Token[] ParseToken(string content)
     {
-        using var mem = this.CreateStream(content);
+        using var mem = CreateStream(content);
         using var reader = new ProtoReader(mem);
         var lexer = new Lexer(reader);
         return lexer.Enumerate().ToArray();
     }
 
-    private MemoryStream CreateStream(string conent)
+    private static MemoryStream CreateStream(string conent)
     {
         return new MemoryStream(Encoding.UTF8.GetBytes(conent));
     }

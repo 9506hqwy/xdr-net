@@ -1,30 +1,25 @@
 ﻿namespace RpcGen;
 
-public class ProgramDef : IDefinition
+public class ProgramDef(IdentifierToken identifier, IList<VersionDef> versions, Value value) : IDefinition
 {
-    public ProgramDef(IdentifierToken identifier, IList<VersionDef> versions, Value value)
-    {
-        this.Identifier = identifier;
-        this.Versions = versions;
-        this.Value = value;
-    }
+    public IdentifierToken Identifier { get; } = identifier;
 
-    public IdentifierToken Identifier { get; }
+    public Value Value { get; } = value;
 
-    public Value Value { get; }
-
-    public IList<VersionDef> Versions { get; }
+    public IList<VersionDef> Versions { get; } = versions;
 
     public static ProgramDef Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         var identifier = reader.ExpectIdentifier();
 
-        reader.ExpectBraceStart();
+        _ = reader.ExpectBraceStart();
 
         var versions = new List<VersionDef>();
         while (!reader.Empty)
         {
-            if (reader.TryExpectBraceEnd(out var _))
+            if (reader.TryExpectBraceEnd(out _))
             {
                 break;
             }
@@ -32,14 +27,14 @@ public class ProgramDef : IDefinition
             var ver = VersionDef.Take(reader);
             versions.Add(ver);
 
-            reader.ExpectSemicolon();
+            _ = reader.ExpectSemicolon();
         }
 
-        reader.ExpectEqual();
+        _ = reader.ExpectEqual();
 
         var value = Value.Take(reader);
 
-        reader.ExpectSemicolon();
+        _ = reader.ExpectSemicolon();
 
         return new ProgramDef(identifier, versions, value);
     }

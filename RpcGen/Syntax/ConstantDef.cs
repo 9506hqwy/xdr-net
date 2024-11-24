@@ -1,26 +1,22 @@
 ﻿namespace RpcGen;
 
-public class ConstantDef : IDefinition
+public class ConstantDef(IdentifierToken identifier, Constant constant) : IDefinition
 {
-    public ConstantDef(IdentifierToken identifier, Constant constant)
-    {
-        this.Identifier = identifier;
-        this.Constant = constant;
-    }
+    public IdentifierToken Identifier { get; } = identifier;
 
-    public IdentifierToken Identifier { get; }
-
-    public Constant Constant { get; }
+    public Constant Constant { get; } = constant;
 
     public static ConstantDef Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         var identifier = reader.ExpectIdentifier();
 
-        reader.ExpectEqual();
+        _ = reader.ExpectEqual();
 
         var constant = Constant.Take(reader);
 
-        reader.ExpectSemicolon();
+        _ = reader.ExpectSemicolon();
 
         return new ConstantDef(identifier, constant);
     }

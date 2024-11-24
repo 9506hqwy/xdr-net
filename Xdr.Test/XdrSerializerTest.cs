@@ -3,6 +3,8 @@
 [TestClass]
 public class XdrSerializerTest
 {
+    private static readonly int[] FixedArray = [1, 2];
+
     private enum EnumTest
     {
         A = 2,
@@ -58,7 +60,7 @@ public class XdrSerializerTest
     [TestMethod]
     public void SerializeInt()
     {
-        var v1 = XdrSerializer.Serialize((int)0);
+        var v1 = XdrSerializer.Serialize(0);
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x00 }, v1);
 
         var v2 = XdrSerializer.Serialize(int.MinValue);
@@ -157,7 +159,7 @@ public class XdrSerializerTest
     [TestMethod]
     public void SerializeFixedXdrOption()
     {
-        var v = XdrSerializer.Serialize(new XdrOption<int>?[] { null, new XdrOption<int>(2) });
+        var v = XdrSerializer.Serialize(new XdrOption<int>?[] { null, new(2) });
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
     }
 
@@ -171,14 +173,14 @@ public class XdrSerializerTest
     [TestMethod]
     public void SerializeVariableXdrOption()
     {
-        var v = XdrSerializer.Serialize(new List<XdrOption<int>?> { null, new XdrOption<int>(2) });
+        var v = XdrSerializer.Serialize(new List<XdrOption<int>?> { null, new(2) });
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
     }
 
     [TestMethod]
     public void SerializeFixedArray()
     {
-        var v = XdrSerializer.Serialize(new int[] { 1, 2 });
+        var v = XdrSerializer.Serialize(FixedArray);
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
     }
 
@@ -196,7 +198,7 @@ public class XdrSerializerTest
         var v1 = XdrSerializer.Serialize(obj1);
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x00 }, v1);
 
-        XdrOption<int> obj2 = new XdrOption<int>(2);
+        XdrOption<int> obj2 = new(2);
         var v2 = XdrSerializer.Serialize(obj2);
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v2);
     }
@@ -205,7 +207,7 @@ public class XdrSerializerTest
     public void SerializeVoid()
     {
         var v = XdrSerializer.Serialize(XdrVoid.Data);
-        CollectionAssert.AreEqual(new byte[] { }, v);
+        CollectionAssert.AreEqual(""u8.ToArray(), v);
     }
 
     [TestMethod]
@@ -267,7 +269,7 @@ public class XdrSerializerTest
     {
         var obj = new StructFixedArrayTest
         {
-            A = new[] { 1, 2 },
+            A = [1, 2],
         };
         var v = XdrSerializer.Serialize(obj);
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v);
@@ -302,13 +304,8 @@ public class XdrSerializerTest
         CollectionAssert.AreEqual(new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 }, v2);
     }
 
-    private class UnionTest : XdrUnion<int>
+    private class UnionTest(int value) : XdrUnion<int>(value)
     {
-        public UnionTest(int value)
-            : base(value)
-        {
-        }
-
         [XdrUnionCase(1)]
         public XdrOption<int>? A { get; set; }
 
@@ -335,14 +332,14 @@ public class XdrSerializerTest
     {
         [XdrElementOrder(1)]
         [XdrFixedLength(2)]
-        public int[] A { get; set; } = Array.Empty<int>();
+        public int[] A { get; set; } = [];
     }
 
     [XdrStruct]
     private class StructVariableArrayTest
     {
         [XdrElementOrder(1)]
-        public List<int> A { get; set; } = new List<int>();
+        public List<int> A { get; set; } = [];
     }
 
     [XdrStruct]

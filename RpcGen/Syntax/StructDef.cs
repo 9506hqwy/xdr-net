@@ -1,27 +1,23 @@
 ﻿namespace RpcGen;
 
-public class StructDef : IDefinition
+public class StructDef(IdentifierToken identifier, IList<Declaration> body) : IDefinition
 {
-    public StructDef(IdentifierToken identifier, IList<Declaration> body)
-    {
-        this.Identifier = identifier;
-        this.Body = body;
-    }
+    public IdentifierToken Identifier { get; } = identifier;
 
-    public IdentifierToken Identifier { get; }
-
-    public IList<Declaration> Body { get; }
+    public IList<Declaration> Body { get; } = body;
 
     public static StructDef Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         var identifier = reader.ExpectIdentifier();
 
-        reader.ExpectBraceStart();
+        _ = reader.ExpectBraceStart();
 
         var body = new List<Declaration>();
         while (!reader.Empty)
         {
-            if (reader.TryExpectBraceEnd(out var _))
+            if (reader.TryExpectBraceEnd(out _))
             {
                 break;
             }
@@ -29,10 +25,10 @@ public class StructDef : IDefinition
             var decl = Declaration.Take(reader);
             body.Add(decl);
 
-            reader.ExpectSemicolon();
+            _ = reader.ExpectSemicolon();
         }
 
-        reader.ExpectSemicolon();
+        _ = reader.ExpectSemicolon();
 
         return new StructDef(identifier, body);
     }

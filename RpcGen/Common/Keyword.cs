@@ -4,18 +4,11 @@ using System.Reflection;
 
 public class Keyword
 {
-    private static readonly Keyword[] Reserved;
+    private static readonly Keyword[] Reserved = [.. Keyword.Enumerate(typeof(ReservedType)).OrderBy(k => k.Value)];
 
-    private static readonly Keyword[] Separator;
+    private static readonly Keyword[] Separator = [.. Keyword.Enumerate(typeof(SeparatorType)).OrderBy(k => k.Value)];
 
-    private static readonly Keyword[] Whitespace;
-
-    static Keyword()
-    {
-        Keyword.Reserved = Keyword.Enumerate(typeof(ReservedType)).OrderBy(k => k.Value).ToArray();
-        Keyword.Separator = Keyword.Enumerate(typeof(SeparatorType)).OrderBy(k => k.Value).ToArray();
-        Keyword.Whitespace = Keyword.Enumerate(typeof(WhitespaceType)).OrderBy(k => k.Value).ToArray();
-    }
+    private static readonly Keyword[] Whitespace = [.. Keyword.Enumerate(typeof(WhitespaceType)).OrderBy(k => k.Value)];
 
     private Keyword(string name, string value)
     {
@@ -23,9 +16,9 @@ public class Keyword
         this.Value = value;
     }
 
-    public static int[] SeparatorChars => Keyword.Convert(Keyword.Separator);
+    internal static int[] SeparatorChars => Keyword.Convert(Keyword.Separator);
 
-    public static int[] WhiteSpaceChars => Keyword.Convert(Keyword.Whitespace);
+    internal static int[] WhiteSpaceChars => Keyword.Convert(Keyword.Whitespace);
 
     public string Name { get; }
 
@@ -48,11 +41,13 @@ public class Keyword
 
     public static bool MatchSeparator(ProtoReader reader, out Keyword? matched)
     {
+        ArgumentNullException.ThrowIfNull(reader);
         return Keyword.TryFind(reader, Keyword.Separator, out matched);
     }
 
     public static bool MatchWhitespace(ProtoReader reader, out Keyword? matched)
     {
+        ArgumentNullException.ThrowIfNull(reader);
         return Keyword.TryFind(reader, Keyword.Whitespace, out matched);
     }
 

@@ -1,27 +1,18 @@
 ﻿namespace RpcGen;
 
-public class Declaration : IDefinition
+public class Declaration(TypeSpecifier typeSpec, string identifier, bool optional, Value? @fixed, bool variable) : IDefinition
 {
     private const string VoidIdentifier = "void";
 
-    public Declaration(TypeSpecifier typeSpec, string identifier, bool optional, Value? @fixed, bool variable)
-    {
-        this.Type = typeSpec;
-        this.Identifier = identifier;
-        this.Optional = optional;
-        this.Fixed = @fixed;
-        this.Variable = variable;
-    }
+    public Value? Fixed { get; } = @fixed;
 
-    public Value? Fixed { get; }
+    public string Identifier { get; } = identifier;
 
-    public string Identifier { get; }
+    public bool Optional { get; } = optional;
 
-    public bool Optional { get; }
+    public TypeSpecifier Type { get; } = typeSpec;
 
-    public TypeSpecifier Type { get; }
-
-    public bool Variable { get; }
+    public bool Variable { get; } = variable;
 
     public static Declaration Take(TokenReader reader)
     {
@@ -36,20 +27,20 @@ public class Declaration : IDefinition
 
         Value? @fixed = null;
         bool variable = false;
-        if (reader.TryExpectAngleBracketStart(out var _))
+        if (reader.TryExpectAngleBracketStart(out _))
         {
-            if (!reader.TryExpectAngleBracketEnd(out var _))
+            if (!reader.TryExpectAngleBracketEnd(out _))
             {
-                Value.Take(reader);
-                reader.ExpectAngleBracketEnd();
+                _ = Value.Take(reader);
+                _ = reader.ExpectAngleBracketEnd();
             }
 
             variable = true;
         }
-        else if (reader.TryExpectBracketStart(out var _))
+        else if (reader.TryExpectBracketStart(out _))
         {
             @fixed = Value.Take(reader);
-            reader.ExpectBracketEnd();
+            _ = reader.ExpectBracketEnd();
         }
 
         return new Declaration(typeSpec, val, val != identifier.Value, @fixed, variable);

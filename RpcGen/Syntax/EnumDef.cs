@@ -1,46 +1,42 @@
 ﻿namespace RpcGen;
 
-public class EnumDef : IDefinition
+public class EnumDef(IdentifierToken identifier, IDictionary<IdentifierToken, Value> body) : IDefinition
 {
-    public EnumDef(IdentifierToken identifier, IDictionary<IdentifierToken, Value> body)
-    {
-        this.Identifier = identifier;
-        this.Body = body;
-    }
+    public IdentifierToken Identifier { get; } = identifier;
 
-    public IdentifierToken Identifier { get; }
-
-    public IDictionary<IdentifierToken, Value> Body { get; }
+    public IDictionary<IdentifierToken, Value> Body { get; } = body;
 
     public static EnumDef Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         var identifier = reader.ExpectIdentifier();
 
-        reader.ExpectBraceStart();
+        _ = reader.ExpectBraceStart();
 
         var body = new Dictionary<IdentifierToken, Value>();
         while (!reader.Empty)
         {
-            if (reader.TryExpectBraceEnd(out var _))
+            if (reader.TryExpectBraceEnd(out _))
             {
                 break;
             }
 
             if (body.Count != 0)
             {
-                reader.ExpectComma();
+                _ = reader.ExpectComma();
             }
 
             var key = reader.ExpectIdentifier();
 
-            reader.ExpectEqual();
+            _ = reader.ExpectEqual();
 
             var value = Value.Take(reader);
 
             body.Add(key, value);
         }
 
-        reader.ExpectSemicolon();
+        _ = reader.ExpectSemicolon();
 
         return new EnumDef(identifier, body);
     }

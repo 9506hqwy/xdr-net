@@ -6,14 +6,9 @@ public interface IXdrOption
 }
 
 [Serializable]
-public class XdrOption<T> : IXdrOption
+public class XdrOption<T>(T value) : IXdrOption
 {
-    public XdrOption(T value)
-    {
-        this.Value = value;
-    }
-
     public object Data => this.Value!;
 
-    public T Value { get; set; }
+    public T Value { get; set; } = value;
 }

@@ -3,7 +3,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-public class Lexer
+public class Lexer(ProtoReader reader)
 {
     private const int EOS = -1;
 
@@ -11,12 +11,7 @@ public class Lexer
     private const string CommentEnd = "*/";
     private const string CommentLine = "%";
 
-    private readonly ProtoReader reader;
-
-    public Lexer(ProtoReader reader)
-    {
-        this.reader = reader;
-    }
+    private readonly ProtoReader reader = reader;
 
     public IEnumerable<Token> Enumerate()
     {
@@ -47,6 +42,7 @@ public class Lexer
                 var position = this.reader.GetReadPosition();
                 var value = this.GetString(this.IsValue);
 
+#pragma warning disable IDE0046
                 if (Keyword.MatchReserved(value, out var reserved))
                 {
                     yield return new ReservedToken
@@ -80,22 +76,21 @@ public class Lexer
                         Value = value,
                     };
                 }
-                else if (Regex.IsMatch(value, @"^\*?[a-zA-Z][a-zA-Z0-9_]*$"))
-                {
-                    yield return new IdentifierToken
-                    {
-                        Position = position,
-                        Value = value,
-                    };
-                }
                 else
                 {
-                    yield return new UnknownToken
-                    {
-                        Position = position,
-                        Value = value,
-                    };
+                    yield return Regex.IsMatch(value, @"^\*?[a-zA-Z][a-zA-Z0-9_]*$")
+                        ? new IdentifierToken
+                        {
+                            Position = position,
+                            Value = value,
+                        }
+                        : new UnknownToken
+                        {
+                            Position = position,
+                            Value = value,
+                        };
                 }
+#pragma warning restore IDE0046
             }
         }
     }
@@ -114,7 +109,7 @@ public class Lexer
             var ch = this.reader.Read();
             if (ch != Lexer.EOS)
             {
-                value.Append((char)ch);
+                _ = value.Append((char)ch);
             }
         }
 
@@ -141,7 +136,7 @@ public class Lexer
             var ch = this.reader.Read();
             if (ch != Lexer.EOS)
             {
-                value.Append((char)ch);
+                _ = value.Append((char)ch);
             }
         }
 
@@ -157,7 +152,7 @@ public class Lexer
         var position = this.reader.GetReadPosition();
 
         var value = new StringBuilder();
-        value.Append((char)this.reader.Read());
+        _ = value.Append((char)this.reader.Read());
 
         return new SeparatorToken
         {
@@ -181,7 +176,7 @@ public class Lexer
             var ch = this.reader.Read();
             if (ch != Lexer.EOS)
             {
-                value.Append((char)ch);
+                _ = value.Append((char)ch);
             }
         }
 
@@ -202,7 +197,7 @@ public class Lexer
         return value == '\n';
     }
 
-    private bool IsSeparator(int value)
+    private static bool IsSeparator(int value)
     {
         return Keyword.SeparatorChars.Contains(value);
     }
@@ -215,6 +210,6 @@ public class Lexer
     private bool IsValue(int value)
     {
         // TODO: Add comment
-        return value > -1 && !this.IsSeparator(value) && !this.IsWhitespace(value);
+        return value > -1 && !IsSeparator(value) && !this.IsWhitespace(value);
     }
 }

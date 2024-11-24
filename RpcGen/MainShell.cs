@@ -18,7 +18,7 @@ internal class MainShell
         }
 
         var destination = new FileInfo(
-            source.FullName.Replace(source.Extension, ".cs"));
+            source.FullName.Replace(source.Extension, ".cs", StringComparison.InvariantCultureIgnoreCase));
 
         try
         {
@@ -32,7 +32,7 @@ internal class MainShell
             var gen = new Generator(spec);
 
             gen.Generate(writer, Utility.ToNsName(
-                source.Name.Replace(source.Extension, string.Empty)));
+                source.Name.Replace(source.Extension, string.Empty, StringComparison.InvariantCulture)));
         }
         catch (Exception e)
         {

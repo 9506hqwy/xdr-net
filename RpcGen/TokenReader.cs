@@ -1,17 +1,12 @@
 ﻿namespace RpcGen;
 
-public class TokenReader
+public class TokenReader(Lexer lexer)
 {
-    private readonly IEnumerator<Token> tokens;
-
-    public TokenReader(Lexer lexer)
-    {
-        this.tokens = lexer
+    private readonly IEnumerator<Token> tokens = lexer
             .Enumerate()
             .Where(t => t is not WhitespaceToken)
             .Where(t => t is not CommentToken)
             .GetEnumerator();
-    }
 
     public Token Current => this.tokens.Current;
 
@@ -164,7 +159,7 @@ public class TokenReader
     {
         if (this.Current is T token && (condition is null || condition(token)))
         {
-            this.Next();
+            _ = this.Next();
             return token;
         }
 

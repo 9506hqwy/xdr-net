@@ -29,6 +29,7 @@ internal static class TokenUtility
 
     internal static object GetObject(CodeTypeReference type, NumberToken number)
     {
+#pragma warning disable IDE0046
         if (type.BaseType == typeof(int).FullName)
         {
             return number.GetValue<int>();
@@ -41,21 +42,20 @@ internal static class TokenUtility
         {
             return number.GetValue<long>();
         }
-        else if (type.BaseType == typeof(ulong).FullName)
-        {
-            return number.GetValue<ulong>();
-        }
         else
         {
-            throw new Exception($"Not supproted number `{number.Value}` ({number.Position}).");
+            return type.BaseType == typeof(ulong).FullName
+                ? number.GetValue<ulong>()
+                : throw new Exception($"Not supproted number `{number.Value}` ({number.Position}).");
         }
+#pragma warning restore IDE0046
     }
 
     internal static bool IsPrimitive(IList<ReservedToken> reserveds)
     {
         try
         {
-            TokenUtility.ToPrimitive(reserveds);
+            _ = TokenUtility.ToPrimitive(reserveds);
             return true;
         }
         catch
@@ -101,16 +101,18 @@ internal static class TokenUtility
         var fieldName = Utility.ToFieldName(ideintifier);
         field = new CodeMemberField(type, fieldName);
 
-        prop = new CodeMemberProperty();
-        prop.Type = type;
+        prop = new CodeMemberProperty
+        {
+            Type = type
+        };
         prop.Attributes &= ~MemberAttributes.AccessMask & ~MemberAttributes.ScopeMask;
         prop.Attributes |= MemberAttributes.Public | MemberAttributes.Final;
         prop.Name = Utility.ToPropertyName(ideintifier);
-        prop.GetStatements.Add(
+        _ = prop.GetStatements.Add(
             new CodeMethodReturnStatement(
                 new CodeFieldReferenceExpression(
                     new CodeThisReferenceExpression(), fieldName)));
-        prop.SetStatements.Add(
+        _ = prop.SetStatements.Add(
             new CodeAssignStatement(
                 new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), fieldName),
                 new CodePropertySetValueReferenceExpression()));

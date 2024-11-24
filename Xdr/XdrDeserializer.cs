@@ -20,7 +20,7 @@ public static class XdrDeserializer
     private static T[] DeserializeArray<T>(IEnumerable<byte> value, int count, out IEnumerable<byte> rest)
     {
         var objs = XdrDeserializer.DeserializeEnumerable<T>(value, count, out rest);
-        return objs.ToArray();
+        return [.. objs];
     }
 
     private static List<T> DeserializeEnumerable<T>(IEnumerable<byte> value, int count, out IEnumerable<byte> rest)
@@ -335,7 +335,7 @@ public static class XdrDeserializer
         property ??= Utility.GetXdrUnionDefault(obj);
 
         var len = Utility.GetXdrFixedLength(property);
-        parameters = new object?[] { rest, len, null };
+        parameters = [rest, len, null];
         var propType = property.PropertyType.GenericTypeArguments.First();
         var data = XdrDeserializer.DeserializeGeneric(
             nameof(DeserializeInternal),

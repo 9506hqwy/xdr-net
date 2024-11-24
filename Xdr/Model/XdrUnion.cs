@@ -6,14 +6,9 @@ public interface IXdrUnion
 }
 
 [Serializable]
-public abstract class XdrUnion<T> : IXdrUnion
+public abstract class XdrUnion<T>(T value) : IXdrUnion
 {
-    public XdrUnion(T value)
-    {
-        this.Value = value;
-    }
-
     public object Data => this.Value!;
 
-    public T Value { get; set; }
+    public T Value { get; set; } = value;
 }

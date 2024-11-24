@@ -1,30 +1,26 @@
 ﻿namespace RpcGen;
 
-public class CaseSpec
+public class CaseSpec(IList<Value> values, Declaration decl)
 {
-    public CaseSpec(IList<Value> values, Declaration decl)
-    {
-        this.Values = values;
-        this.Declaration = decl;
-    }
+    public Declaration Declaration { get; } = decl;
 
-    public Declaration Declaration { get; }
-
-    public IList<Value> Values { get; }
+    public IList<Value> Values { get; } = values;
 
     public static CaseSpec Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         var values = new List<Value>();
-        while (reader.TryExpectCase(out var _))
+        while (reader.TryExpectCase(out _))
         {
             var value = Value.Take(reader);
             values.Add(value);
-            reader.ExpectColon();
+            _ = reader.ExpectColon();
         }
 
         var decl = Declaration.Take(reader);
 
-        reader.ExpectSemicolon();
+        _ = reader.ExpectSemicolon();
 
         return new CaseSpec(values, decl);
     }

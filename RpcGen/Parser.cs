@@ -1,13 +1,8 @@
 ﻿namespace RpcGen;
 
-public class Parser
+public class Parser(Lexer lexer)
 {
-    private readonly TokenReader reader;
-
-    public Parser(Lexer lexer)
-    {
-        this.reader = new TokenReader(lexer);
-    }
+    private readonly TokenReader reader = new(lexer);
 
     public Specification Parse()
     {

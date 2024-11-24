@@ -1,22 +1,22 @@
 ﻿namespace RpcGen;
 
-public class Specification
+public class Specification(IDefinition[] definitions)
 {
-    public Specification(IDefinition[] definitions)
-    {
-        this.Definitions = definitions;
-    }
-
-    public IDefinition[] Definitions { get; }
+#pragma warning disable CA1819
+    public IDefinition[] Definitions { get; } = definitions;
+#pragma warning restore CA1819
 
     public static Specification Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         var defs = new List<IDefinition>();
 
-        reader.Next();
+        _ = reader.Next();
         while (!reader.Empty)
         {
             var token = reader.ExpectReserved();
+#pragma warning disable IDE0010
             switch (token.Type)
             {
                 case ReservedType.KeywordEnum:
@@ -29,7 +29,7 @@ public class Specification
                     break;
                 case ReservedType.KeywordTypedef:
                     var decl = Declaration.Take(reader);
-                    reader.ExpectSemicolon();
+                    _ = reader.ExpectSemicolon();
                     defs.Add(decl);
                     break;
                 case ReservedType.KeywordUnion:
@@ -47,8 +47,9 @@ public class Specification
                 default:
                     throw new Exception($"Not supported keyword {token.Value} ({token.Position}).");
             }
+#pragma warning restore IDE0010
         }
 
-        return new Specification(defs.ToArray());
+        return new Specification([.. defs]);
     }
 }

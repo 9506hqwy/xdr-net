@@ -93,23 +93,18 @@ public static class XdrSerializer
 
     public static byte[] Serialize(IXdrOption? value)
     {
-        if (value is null)
-        {
-            return XdrSerializer.Serialize(0);
-        }
-        else
-        {
-            return XdrSerializer.Serialize(1)
-                .Concat(XdrSerializer.Serialize(value.Data))
-                .ToArray();
-        }
+        return value is null
+            ? XdrSerializer.Serialize(0)
+            : ([.. XdrSerializer.Serialize(1)
+,
+                .. XdrSerializer.Serialize(value.Data)]);
     }
 
 #pragma warning disable IDE0060
     public static byte[] Serialize(XdrVoid value)
 #pragma warning restore IDE0060
     {
-        return Array.Empty<byte>();
+        return [];
     }
 
     public static byte[] Serialize(IXdrUnion value)
@@ -121,7 +116,7 @@ public static class XdrSerializer
         property ??= Utility.GetXdrUnionDefault(value);
 
         var propValue = property.GetValue(value) as IXdrOption;
-        return bytes.Concat(XdrSerializer.Serialize(propValue!.Data)).ToArray();
+        return [.. bytes, .. XdrSerializer.Serialize(propValue!.Data)];
     }
 
     public static byte[] Serialize(object? value)
@@ -158,28 +153,19 @@ public static class XdrSerializer
             default: break;
         }
 
-        if (type.IsArray)
-        {
-            return (byte[])typeof(XdrSerializer)
+        return type.IsArray
+            ? (byte[])typeof(XdrSerializer)
                 .GetMethod(nameof(SerializeFixedArray), BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(type.GetElementType())
-                .Invoke(null, new object[] { value });
-        }
-
-        if (typeof(IEnumerable).IsAssignableFrom(type))
-        {
-            return (byte[])typeof(XdrSerializer)
+                .Invoke(null, [value])
+            : typeof(IEnumerable).IsAssignableFrom(type)
+            ? (byte[])typeof(XdrSerializer)
                 .GetMethod(nameof(SerializeVariableArray), BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(type.GenericTypeArguments.First())
-                .Invoke(null, new object[] { value });
-        }
-
-        if (type.GetCustomAttributes<XdrStructAttribute>().Any())
-        {
-            return XdrSerializer.SerializeStruct(value);
-        }
-
-        throw new NotSupportedException($"Not support type `{type.FullName}`.");
+                .Invoke(null, [value])
+            : type.GetCustomAttributes<XdrStructAttribute>().Any()
+            ? XdrSerializer.SerializeStruct(value)
+            : throw new NotSupportedException($"Not support type `{type.FullName}`.");
     }
 
     private static byte[] Serialize(Type type, object value)
@@ -200,13 +186,13 @@ public static class XdrSerializer
         int len = value.Count();
         int paddingLen = 4 - (len % 4);
 
-        var bytes = prefixLength ? XdrSerializer.Serialize(len) : Array.Empty<byte>();
-        bytes = bytes.Concat(value).ToArray();
+        var bytes = prefixLength ? XdrSerializer.Serialize(len) : [];
+        bytes = [.. bytes, .. value];
 
         if (paddingLen < 4)
         {
             var padding = new byte[paddingLen];
-            bytes = bytes.Concat(padding).ToArray();
+            bytes = [.. bytes, .. padding];
         }
 
         return bytes;
@@ -243,6 +229,6 @@ public static class XdrSerializer
             .SelectMany(o => XdrSerializer.Serialize(typeof(T), o))
             .ToArray();
 
-        return bytes.Concat(arr).ToArray();
+        return [.. bytes, .. arr];
     }
 }

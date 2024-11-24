@@ -22,6 +22,8 @@ public class TypeSpecifier
 
     public static TypeSpecifier Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         if (reader.TryExpectIdentifier(out var identifier))
         {
             return new TypeSpecifier(identifier!);
@@ -33,12 +35,9 @@ public class TypeSpecifier
             reserveds.Add(reserved!);
         }
 
-        if (reserveds.Count == 0)
-        {
-            throw new Exception($"Not found identifier ({reader.Current.Position}).");
-        }
-
-        return new TypeSpecifier(reserveds);
+        return reserveds.Count == 0
+            ? throw new Exception($"Not found identifier ({reader.Current.Position}).")
+            : new TypeSpecifier(reserveds);
     }
 
     public bool IsType(ReservedType type) => this.Reserved?.Any(r => r.Type == type) ?? false;

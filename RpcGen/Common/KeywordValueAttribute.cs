@@ -1,12 +1,7 @@
 ﻿namespace RpcGen;
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-public class KeywordValueAttribute : Attribute
+public sealed class KeywordValueAttribute(string value) : Attribute
 {
-    public KeywordValueAttribute(string value)
-    {
-        this.Value = value;
-    }
-
-    public string Value { get; }
+    public string Value { get; } = value;
 }

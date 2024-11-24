@@ -18,6 +18,8 @@ public class Constant
 
     public static Constant Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         if (reader.TryExpectNumber(out var number))
         {
             return new Constant(number!);

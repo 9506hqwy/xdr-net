@@ -8,13 +8,16 @@ public class ProtoReader : TextReader
 
     private const char NEWLINE = '\n';
 
+#pragma warning disable CA2213
     private readonly Stream stream;
+#pragma warning restore CA2213
 
-    private int currentByte = '\0';
+    private int currentByte;
 
     public ProtoReader(Stream stream)
     {
         this.stream = stream;
+        this.currentByte = '\0';
         this.NextLinePosition();
     }
 
@@ -24,6 +27,7 @@ public class ProtoReader : TextReader
 
     public bool EndOfStream => this.currentByte == ProtoReader.EOS;
 
+#pragma warning disable CA1024
     public Position GetReadPosition()
     {
         return new Position
@@ -32,6 +36,7 @@ public class ProtoReader : TextReader
             Line = this.CurrentLine,
         };
     }
+#pragma warning restore CA1024
 
     public override int Peek()
     {
@@ -39,7 +44,7 @@ public class ProtoReader : TextReader
 
         if (b > ProtoReader.EOS)
         {
-            this.stream.Seek(-1, SeekOrigin.Current);
+            _ = this.stream.Seek(-1, SeekOrigin.Current);
         }
 
         return b;
@@ -68,7 +73,7 @@ public class ProtoReader : TextReader
     {
         for (int i = 0; i < count; i++)
         {
-            this.Read();
+            _ = this.Read();
         }
     }
 
@@ -76,12 +81,13 @@ public class ProtoReader : TextReader
     {
         while (this.StartsWithAny(matches))
         {
-            this.Read();
+            _ = this.Read();
         }
     }
 
     public bool StartsWith(Predicate<int> matcher)
     {
+        ArgumentNullException.ThrowIfNull(matcher);
         var b = this.Peek();
         return matcher(b);
     }
@@ -93,11 +99,9 @@ public class ProtoReader : TextReader
         var buf = new byte[bytes.Length];
         var num = this.stream.Read(buf, 0, bytes.Length);
 
-        this.stream.Seek(num * -1, SeekOrigin.Current);
+        _ = this.stream.Seek(num * -1, SeekOrigin.Current);
 
-        return (num == bytes.Length) ?
-            bytes.Zip(buf).All(v => v.First == v.Second) :
-            false;
+        return (num == bytes.Length) && bytes.Zip(buf).All(v => v.First == v.Second);
     }
 
     public bool StartsWithAny(int[] values)

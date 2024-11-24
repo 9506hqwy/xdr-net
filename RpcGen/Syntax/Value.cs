@@ -22,6 +22,8 @@ public class Value
 
     public static Value Take(TokenReader reader)
     {
+        ArgumentNullException.ThrowIfNull(reader);
+
         if (reader.TryExpectIdentifier(out var identifier))
         {
             return new Value(identifier!);

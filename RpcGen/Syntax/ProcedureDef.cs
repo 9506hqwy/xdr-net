@@ -1,22 +1,14 @@
 ﻿namespace RpcGen;
 
-public class ProcedureDef
+public class ProcedureDef(IdentifierToken identifier, TypeSpecifier returnType, TypeSpecifier argType, Value value)
 {
-    public ProcedureDef(IdentifierToken identifier, TypeSpecifier returnType, TypeSpecifier argType, Value value)
-    {
-        this.Identifier = identifier;
-        this.ReturnType = returnType;
-        this.ArgType = argType;
-        this.Value = value;
-    }
+    public TypeSpecifier ArgType { get; } = argType;
 
-    public TypeSpecifier ArgType { get; }
+    public IdentifierToken Identifier { get; } = identifier;
 
-    public IdentifierToken Identifier { get; }
+    public TypeSpecifier ReturnType { get; } = returnType;
 
-    public TypeSpecifier ReturnType { get; }
-
-    public Value Value { get; }
+    public Value Value { get; } = value;
 
     public static ProcedureDef Take(TokenReader reader)
     {
@@ -24,13 +16,13 @@ public class ProcedureDef
 
         var identifier = reader.ExpectIdentifier();
 
-        reader.ExpectParenStart();
+        _ = reader.ExpectParenStart();
 
         var argType = TypeSpecifier.Take(reader);
 
-        reader.ExpectParenEnd();
+        _ = reader.ExpectParenEnd();
 
-        reader.ExpectEqual();
+        _ = reader.ExpectEqual();
 
         var value = Value.Take(reader);
 

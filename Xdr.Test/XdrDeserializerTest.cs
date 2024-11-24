@@ -1,8 +1,11 @@
 ﻿namespace Xdr.Test;
 
+#pragma warning disable CA1812
 [TestClass]
 public class XdrDeserializerTest
 {
+    private static readonly int[] FixedArray = [1, 2];
+
     private enum EnumTest
     {
         A = 2,
@@ -250,7 +253,7 @@ public class XdrDeserializerTest
     {
         var bytes = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
         var v = (int[])XdrDeserializer.Deserialize<int[]>(bytes, 2, out var rest);
-        CollectionAssert.AreEqual(new int[] { 1, 2 }, v);
+        CollectionAssert.AreEqual(FixedArray, v);
         Assert.IsFalse(rest.Any());
     }
 
@@ -351,7 +354,7 @@ public class XdrDeserializerTest
     {
         var bytes = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
         var v = (StructFixedArrayTest)XdrDeserializer.Deserialize<StructFixedArrayTest>(bytes, out var rest);
-        CollectionAssert.AreEqual(new[] { 1, 2 }, v!.A);
+        CollectionAssert.AreEqual(FixedArray, v!.A);
         Assert.IsFalse(rest.Any());
     }
 
@@ -378,13 +381,8 @@ public class XdrDeserializerTest
         Assert.IsFalse(rest2.Any());
     }
 
-    private class UnionTest : XdrUnion<int>
+    private class UnionTest(int value) : XdrUnion<int>(value)
     {
-        public UnionTest(int value)
-            : base(value)
-        {
-        }
-
         [XdrUnionCase(1)]
         public XdrOption<int>? A { get; set; }
 
@@ -411,14 +409,14 @@ public class XdrDeserializerTest
     {
         [XdrElementOrder(1)]
         [XdrFixedLength(2)]
-        public int[] A { get; set; } = Array.Empty<int>();
+        public int[] A { get; set; } = [];
     }
 
     [XdrStruct]
     private class StructVariableArrayTest
     {
         [XdrElementOrder(1)]
-        public List<int> A { get; set; } = new List<int>();
+        public List<int> A { get; set; } = [];
     }
 
     [XdrStruct]
@@ -428,3 +426,4 @@ public class XdrDeserializerTest
         public XdrOption<int>? A { get; set; }
     }
 }
+#pragma warning restore CA1812
