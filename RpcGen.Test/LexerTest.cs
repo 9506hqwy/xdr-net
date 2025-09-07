@@ -1,6 +1,6 @@
-﻿namespace RpcGen.Test;
+﻿using System.Text;
 
-using System.Text;
+namespace RpcGen.Test;
 
 [TestClass]
 public class LexerTest
@@ -117,7 +117,7 @@ public class LexerTest
         using var mem = CreateStream(content);
         using var reader = new ProtoReader(mem);
         var lexer = new Lexer(reader);
-        return lexer.Enumerate().ToArray();
+        return [.. lexer.Enumerate()];
     }
 
     private static MemoryStream CreateStream(string conent)

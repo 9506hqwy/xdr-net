@@ -1,37 +1,39 @@
-﻿namespace RpcGen;
-
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
+
+namespace RpcGen;
 
 internal static class Utility
 {
     internal static string ToClassName(string value)
     {
-        return Utility.ToUpperCamelCase(value);
+        return ToUpperCamelCase(value);
     }
 
     internal static string ToFieldName(string value)
     {
-        return Utility.ToLowerCamelCase(value);
+        return ToLowerCamelCase(value);
     }
 
     internal static string ToNsName(string value)
     {
-        return Utility.ToUpperCamelCase(value);
+        return ToUpperCamelCase(value);
     }
 
     internal static string ToPropertyName(string value)
     {
-        return Utility.ToUpperCamelCase(value);
+        return ToUpperCamelCase(value);
     }
 
     private static string ToLowerCamelCase(string value)
     {
+#pragma warning disable CA1308
         var terms = Regex.Replace(value, @"([A-Z]+)", "_$1")
             .Trim('_')
             .Split('_')
             .Select(t => t.ToLowerInvariant())
-            .Select((t, i) => i == 0 ? t : Utility.ToCaption(t));
+            .Select((t, i) => i == 0 ? t : ToCaption(t));
+#pragma warning restore CA1308
         return string.Join(string.Empty, terms);
     }
 
@@ -40,7 +42,7 @@ internal static class Utility
         var terms = Regex.Replace(value, @"([A-Z]+)", "_$1")
             .Trim('_')
             .Split('_')
-            .Select(Utility.ToCaption);
+            .Select(ToCaption);
         return string.Join(string.Empty, terms);
     }
 

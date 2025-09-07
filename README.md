@@ -12,25 +12,25 @@ var val = XdrDeserializer.Deserialize<int>(bytes);
 
 ## Data Types
 
-| XDR                         | C#                                             |
-| --------------------------- | ---------------------------------------------- |
-| Integer                     | short, int                                     |
-| Unsigned Integer            | ushort, uint, bool, byte, char                 |
-| Enumeration                 | enum                                           |
-| Hyper Integer               | long                                           |
-| Unsigned Hyper Integer      | ulong                                          |
-| Floatinng-Point             | float                                          |
-| Double-Precision            | double                                         |
-| Quadruple-Precision         |                                                |
-| Fixed-Length Opaque Data    | byte[] [^1]                                    |
-| Variable-Length Opaque Data | IList\<byte>                                   |
-| String                      | string                                         |
-| Fixed-Length Arary          | T[] [^1]                                       |
-| Variable-Length Array       | IList\<T>                                      |
-| Structure                   | class                                          |
-| Discriminated Union         | XdrUnion\<T>                                   |
-| Void                        | XdrVoid                                        |
-| Optional-Data               | XdrOption\<T>                                  |
+| XDR                         | C#                             |
+| --------------------------- | ------------------------------ |
+| Integer                     | short, int                     |
+| Unsigned Integer            | ushort, uint, bool, byte, char |
+| Enumeration                 | enum                           |
+| Hyper Integer               | long                           |
+| Unsigned Hyper Integer      | ulong                          |
+| Floatinng-Point             | float                          |
+| Double-Precision            | double                         |
+| Quadruple-Precision         |                                |
+| Fixed-Length Opaque Data    | byte[] [^1]                    |
+| Variable-Length Opaque Data | IList\<byte>                   |
+| String                      | string                         |
+| Fixed-Length Arary          | T[] [^1]                       |
+| Variable-Length Array       | IList\<T>                      |
+| Structure                   | class                          |
+| Discriminated Union         | XdrUnion\<T>                   |
+| Void                        | XdrVoid                        |
+| Optional-Data               | XdrOption\<T>                  |
 
 [^1]: need `[Xdr.XdrFixedLength(N)]` attribute to struct property.
 
@@ -38,7 +38,7 @@ var val = XdrDeserializer.Deserialize<int>(bytes);
 
 XDR structure is mapped to bellow C# code.
 
-```
+```xdr
 struct file {
    string filename<256>;
    filetype type;
@@ -70,7 +70,7 @@ class File
 
 XDR union is mapped to bellow C# code.
 
-```
+```xdr
 enum filekind {
    TEXT = 0,
    DATA = 1,

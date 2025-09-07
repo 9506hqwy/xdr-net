@@ -1,14 +1,14 @@
-﻿namespace RpcGen;
+﻿using System.Reflection;
 
-using System.Reflection;
+namespace RpcGen;
 
 public class Keyword
 {
-    private static readonly Keyword[] Reserved = [.. Keyword.Enumerate(typeof(ReservedType)).OrderBy(k => k.Value)];
+    private static readonly Keyword[] Reserved = [.. Enumerate(typeof(ReservedType)).OrderBy(k => k.Value)];
 
-    private static readonly Keyword[] Separator = [.. Keyword.Enumerate(typeof(SeparatorType)).OrderBy(k => k.Value)];
+    private static readonly Keyword[] Separator = [.. Enumerate(typeof(SeparatorType)).OrderBy(k => k.Value)];
 
-    private static readonly Keyword[] Whitespace = [.. Keyword.Enumerate(typeof(WhitespaceType)).OrderBy(k => k.Value)];
+    private static readonly Keyword[] Whitespace = [.. Enumerate(typeof(WhitespaceType)).OrderBy(k => k.Value)];
 
     private Keyword(string name, string value)
     {
@@ -16,9 +16,9 @@ public class Keyword
         this.Value = value;
     }
 
-    internal static int[] SeparatorChars => Keyword.Convert(Keyword.Separator);
+    internal static int[] SeparatorChars => Convert(Separator);
 
-    internal static int[] WhiteSpaceChars => Keyword.Convert(Keyword.Whitespace);
+    internal static int[] WhiteSpaceChars => Convert(Whitespace);
 
     public string Name { get; }
 
@@ -26,7 +26,7 @@ public class Keyword
 
     public static bool MatchReserved(string value, out Keyword? matched)
     {
-        foreach (var keyword in Keyword.Reserved)
+        foreach (var keyword in Reserved)
         {
             if (value == keyword.Value)
             {
@@ -42,18 +42,18 @@ public class Keyword
     public static bool MatchSeparator(ProtoReader reader, out Keyword? matched)
     {
         ArgumentNullException.ThrowIfNull(reader);
-        return Keyword.TryFind(reader, Keyword.Separator, out matched);
+        return TryFind(reader, Separator, out matched);
     }
 
     public static bool MatchWhitespace(ProtoReader reader, out Keyword? matched)
     {
         ArgumentNullException.ThrowIfNull(reader);
-        return Keyword.TryFind(reader, Keyword.Whitespace, out matched);
+        return TryFind(reader, Whitespace, out matched);
     }
 
     private static int[] Convert(Keyword[] keywords)
     {
-        return keywords.SelectMany(k => k.Value.ToCharArray()).Select(c => (int)c).ToArray();
+        return [.. keywords.SelectMany(k => k.Value.ToCharArray()).Select(c => (int)c)];
     }
 
     private static IEnumerable<Keyword> Enumerate(Type type)

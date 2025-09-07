@@ -1,25 +1,24 @@
-﻿namespace Xdr.Serialization;
-
-using System.Collections;
-using System.Linq;
+﻿using System.Collections;
 using System.Reflection;
 using System.Text;
+
+namespace Xdr.Serialization;
 
 public static class XdrDeserializer
 {
     public static object Deserialize<T>(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        return XdrDeserializer.DeserializeInternal<T>(value, 0, out rest);
+        return DeserializeInternal<T>(value, 0, out rest);
     }
 
     public static object Deserialize<T>(IEnumerable<byte> value, int count, out IEnumerable<byte> rest)
     {
-        return XdrDeserializer.DeserializeInternal<T>(value, count, out rest);
+        return DeserializeInternal<T>(value, count, out rest);
     }
 
     private static T[] DeserializeArray<T>(IEnumerable<byte> value, int count, out IEnumerable<byte> rest)
     {
-        var objs = XdrDeserializer.DeserializeEnumerable<T>(value, count, out rest);
+        var objs = DeserializeEnumerable<T>(value, count, out rest);
         return [.. objs];
     }
 
@@ -30,7 +29,7 @@ public static class XdrDeserializer
         var results = new List<T>();
         for (int i = 0; i < count; i++)
         {
-            var obj = (T)XdrDeserializer.Deserialize<T>(rest, out rest);
+            var obj = (T)Deserialize<T>(rest, out rest);
             results.Add(obj);
         }
 
@@ -56,69 +55,69 @@ public static class XdrDeserializer
 
         if (type.IsEnum)
         {
-            return XdrDeserializer.ReadEnum<T>(value, out rest)!;
+            return ReadEnum<T>(value, out rest)!;
         }
         else if (type == typeof(bool))
         {
-            return XdrDeserializer.ReadBool(value, out rest);
+            return ReadBool(value, out rest);
         }
         else if (type == typeof(short))
         {
-            return XdrDeserializer.ReadShort(value, out rest);
+            return ReadShort(value, out rest);
         }
         else if (type == typeof(int))
         {
-            return XdrDeserializer.ReadInt(value, out rest);
+            return ReadInt(value, out rest);
         }
         else if (type == typeof(long))
         {
-            return XdrDeserializer.ReadLong(value, out rest);
+            return ReadLong(value, out rest);
         }
         else if (type == typeof(ushort))
         {
-            return XdrDeserializer.ReadUshort(value, out rest);
+            return ReadUshort(value, out rest);
         }
         else if (type == typeof(uint))
         {
-            return XdrDeserializer.ReadUint(value, out rest);
+            return ReadUint(value, out rest);
         }
         else if (type == typeof(ulong))
         {
-            return XdrDeserializer.ReadUlong(value, out rest);
+            return ReadUlong(value, out rest);
         }
         else if (type == typeof(float))
         {
-            return XdrDeserializer.ReadFloat(value, out rest);
+            return ReadFloat(value, out rest);
         }
         else if (type == typeof(double))
         {
-            return XdrDeserializer.ReadDouble(value, out rest);
+            return ReadDouble(value, out rest);
         }
         else if (type == typeof(char))
         {
-            return XdrDeserializer.ReadChar(value, out rest);
+            return ReadChar(value, out rest);
         }
         else if (type == typeof(string))
         {
-            return XdrDeserializer.ReadString(value, out rest);
+            return ReadString(value, out rest);
         }
         else if (type == typeof(byte))
         {
-            return XdrDeserializer.ReadByte(value, out rest);
+            return ReadByte(value, out rest);
         }
         else if (type == typeof(byte[]))
         {
-            return XdrDeserializer.ReadBytes(value, count, out rest);
+            return ReadBytes(value, count, out rest);
         }
         else if (typeof(IList<byte>).IsAssignableFrom(type))
         {
-            var objs = XdrDeserializer.ReadVariableBytes(value, out rest);
+            var objs = ReadVariableBytes(value, out rest);
             return Activator.CreateInstance(type, objs);
         }
         else if (typeof(IXdrOption).IsAssignableFrom(type))
         {
             var parameters = new object?[] { value, null };
-            var obj = XdrDeserializer.DeserializeGeneric(
+            var obj = DeserializeGeneric(
                 nameof(ReadOption),
                 type.GenericTypeArguments.First(),
                 parameters);
@@ -127,18 +126,18 @@ public static class XdrDeserializer
         }
         else if (typeof(XdrVoid).IsAssignableFrom(type))
         {
-            return XdrDeserializer.ReadVoid(value, out rest);
+            return ReadVoid(value, out rest);
         }
         else if (typeof(IXdrUnion).IsAssignableFrom(type))
         {
             // TODO: Find XdrUnion<> type.
             var valueType = type.BaseType.GenericTypeArguments.First();
-            return XdrDeserializer.ReadUnion<T>(valueType, value, out rest)!;
+            return ReadUnion<T>(valueType, value, out rest)!;
         }
         else if (type.IsArray)
         {
             var parameters = new object?[] { value, count, null };
-            var objs = XdrDeserializer.DeserializeGeneric(
+            var objs = DeserializeGeneric(
                 nameof(DeserializeArray),
                 type.GetElementType(),
                 parameters);
@@ -147,9 +146,9 @@ public static class XdrDeserializer
         }
         else if (typeof(IEnumerable).IsAssignableFrom(type))
         {
-            var len = XdrDeserializer.ReadInt(value, out var temp);
+            var len = ReadInt(value, out var temp);
             var parameters = new object?[] { temp, len, null };
-            var objs = XdrDeserializer.DeserializeGeneric(
+            var objs = DeserializeGeneric(
                 nameof(DeserializeEnumerable),
                 type.GenericTypeArguments.First(),
                 parameters);
@@ -158,7 +157,7 @@ public static class XdrDeserializer
         }
         else if (type.GetCustomAttributes<XdrStructAttribute>().Any())
         {
-            return XdrDeserializer.ReadStruct<T>(value, out rest)!;
+            return ReadStruct<T>(value, out rest)!;
         }
 
         throw new NotSupportedException($"Not support type `{type.FullName}`.");
@@ -167,87 +166,87 @@ public static class XdrDeserializer
     private static byte[] Read(IEnumerable<byte> value, int count, out IEnumerable<byte> rest)
     {
         rest = value.Skip(count);
-        return value.Take(count).ToArray();
+        return [.. value.Take(count)];
     }
 
     private static bool ReadBool(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var v = XdrDeserializer.ReadInt(value, out rest);
+        var v = ReadInt(value, out rest);
         return v != 0;
     }
 
     private static short ReadShort(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        var bytes = Read(value, 4, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToInt16(bytes, 0);
     }
 
     private static int ReadInt(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        var bytes = Read(value, 4, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToInt32(bytes, 0);
     }
 
     private static long ReadLong(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 8, out rest);
+        var bytes = Read(value, 8, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToInt64(bytes, 0);
     }
 
     private static ushort ReadUshort(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        var bytes = Read(value, 4, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToUInt16(bytes, 0);
     }
 
     private static uint ReadUint(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        var bytes = Read(value, 4, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToUInt32(bytes, 0);
     }
 
     private static ulong ReadUlong(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 8, out rest);
+        var bytes = Read(value, 8, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToUInt64(bytes, 0);
     }
 
     private static float ReadFloat(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        var bytes = Read(value, 4, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToSingle(bytes, 0);
     }
 
     private static double ReadDouble(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 8, out rest);
+        var bytes = Read(value, 8, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToDouble(bytes, 0);
     }
 
     private static char ReadChar(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        var bytes = Read(value, 4, out rest);
         Array.Reverse(bytes);
         return BitConverter.ToChar(bytes, 0);
     }
 
     private static string ReadString(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.ReadVariableBytes(value, out rest);
+        var bytes = ReadVariableBytes(value, out rest);
         return Encoding.UTF8.GetString(bytes);
     }
 
     private static byte ReadByte(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var bytes = XdrDeserializer.Read(value, 4, out rest);
+        var bytes = Read(value, 4, out rest);
         Array.Reverse(bytes);
         return bytes[0];
     }
@@ -256,7 +255,7 @@ public static class XdrDeserializer
     {
         var padding = 4 - (count % 4);
 
-        var bytes = XdrDeserializer.Read(value, count, out rest);
+        var bytes = Read(value, count, out rest);
 
         if (padding < 4)
         {
@@ -268,15 +267,15 @@ public static class XdrDeserializer
 
     private static byte[] ReadVariableBytes(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var len = XdrDeserializer.ReadInt(value, out rest);
-        return XdrDeserializer.ReadBytes(rest, len, out rest);
+        var len = ReadInt(value, out rest);
+        return ReadBytes(rest, len, out rest);
     }
 
     private static IXdrOption? ReadOption<T>(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        if (XdrDeserializer.ReadBool(value, out rest))
+        if (ReadBool(value, out rest))
         {
-            var data = (T)XdrDeserializer.Deserialize<T>(rest, out rest);
+            var data = (T)Deserialize<T>(rest, out rest);
             return new XdrOption<T>(data);
         }
         else
@@ -293,7 +292,7 @@ public static class XdrDeserializer
 
     private static T ReadEnum<T>(IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
-        var v = XdrDeserializer.ReadInt(value, out rest);
+        var v = ReadInt(value, out rest);
         return (T)Enum.ToObject(typeof(T), v);
     }
 
@@ -307,7 +306,7 @@ public static class XdrDeserializer
         {
             var len = Utility.GetXdrFixedLength(property);
             var parameters = new object?[] { rest, len, null };
-            var v = XdrDeserializer.DeserializeGeneric(
+            var v = DeserializeGeneric(
                 nameof(DeserializeInternal),
                 property.PropertyType,
                 parameters);
@@ -322,7 +321,7 @@ public static class XdrDeserializer
     private static T ReadUnion<T>(Type valueType, IEnumerable<byte> value, out IEnumerable<byte> rest)
     {
         var parameters = new object?[] { value, 0, null };
-        var condition = XdrDeserializer.DeserializeGeneric(
+        var condition = DeserializeGeneric(
             nameof(DeserializeInternal),
             valueType,
             parameters);
@@ -337,7 +336,7 @@ public static class XdrDeserializer
         var len = Utility.GetXdrFixedLength(property);
         parameters = [rest, len, null];
         var propType = property.PropertyType.GenericTypeArguments.First();
-        var data = XdrDeserializer.DeserializeGeneric(
+        var data = DeserializeGeneric(
             nameof(DeserializeInternal),
             propType,
             parameters);

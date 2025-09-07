@@ -1,6 +1,6 @@
-﻿namespace RpcGen;
+﻿using System.CodeDom;
 
-using System.CodeDom;
+namespace RpcGen;
 
 internal static class TokenUtility
 {
@@ -12,7 +12,9 @@ internal static class TokenUtility
             type = typeof(uint);
             return true;
         }
+#pragma warning disable CA1031
         catch
+#pragma warning restore CA1031
         {
             try
             {
@@ -20,7 +22,9 @@ internal static class TokenUtility
                 type = typeof(ulong);
                 return true;
             }
+#pragma warning disable CA1031
             catch
+#pragma warning restore CA1031
             {
                 throw new Exception($"Not supproted number `{number.Value}` ({number.Position}).");
             }
@@ -55,10 +59,12 @@ internal static class TokenUtility
     {
         try
         {
-            _ = TokenUtility.ToPrimitive(reserveds);
+            _ = ToPrimitive(reserveds);
             return true;
         }
+#pragma warning disable CA1031
         catch
+#pragma warning restore CA1031
         {
             return false;
         }
@@ -66,9 +72,11 @@ internal static class TokenUtility
 
     internal static Type ToPrimitive(IList<ReservedToken> reserveds)
     {
+#pragma warning disable CA1308
         var type = string.Join(
             " ",
             reserveds.Select(t => t.Value.ToLowerInvariant()));
+#pragma warning restore CA1308
         return type switch
         {
             "unsigned" => typeof(uint),

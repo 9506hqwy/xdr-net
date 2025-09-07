@@ -1,6 +1,6 @@
-﻿namespace Xdr;
+﻿using System.Reflection;
 
-using System.Reflection;
+namespace Xdr;
 
 internal static class Utility
 {
@@ -14,7 +14,7 @@ internal static class Utility
     {
         return value.GetType()
             .GetProperties()
-            .FirstOrDefault(Utility.IsXdrDefault);
+            .FirstOrDefault(IsXdrDefault);
     }
 
     internal static PropertyInfo[] GetXdrStructElement(object value)

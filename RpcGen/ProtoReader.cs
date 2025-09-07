@@ -1,6 +1,6 @@
-﻿namespace RpcGen;
+﻿using System.Text;
 
-using System.Text;
+namespace RpcGen;
 
 public class ProtoReader : TextReader
 {
@@ -25,7 +25,7 @@ public class ProtoReader : TextReader
 
     public int CurrentColumn { get; private set; }
 
-    public bool EndOfStream => this.currentByte == ProtoReader.EOS;
+    public bool EndOfStream => this.currentByte == EOS;
 
 #pragma warning disable CA1024
     public Position GetReadPosition()
@@ -42,7 +42,7 @@ public class ProtoReader : TextReader
     {
         var b = this.stream.ReadByte();
 
-        if (b > ProtoReader.EOS)
+        if (b > EOS)
         {
             _ = this.stream.Seek(-1, SeekOrigin.Current);
         }
@@ -54,9 +54,9 @@ public class ProtoReader : TextReader
     {
         this.currentByte = this.stream.ReadByte();
 
-        if (this.currentByte > ProtoReader.EOS)
+        if (this.currentByte > EOS)
         {
-            if (this.currentByte == ProtoReader.NEWLINE)
+            if (this.currentByte == NEWLINE)
             {
                 this.NextLinePosition();
             }

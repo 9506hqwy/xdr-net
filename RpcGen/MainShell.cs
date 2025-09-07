@@ -34,7 +34,9 @@ internal class MainShell
             gen.Generate(writer, Utility.ToNsName(
                 source.Name.Replace(source.Extension, string.Empty, StringComparison.InvariantCulture)));
         }
+#pragma warning disable CA1031
         catch (Exception e)
+#pragma warning restore CA1031
         {
             Console.Error.WriteLine("{0}", e);
             Environment.Exit(1);

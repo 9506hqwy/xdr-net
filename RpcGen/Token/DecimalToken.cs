@@ -1,6 +1,6 @@
-﻿namespace RpcGen;
+﻿using System.Globalization;
 
-using System.Globalization;
+namespace RpcGen;
 
 public sealed class DecimalToken : NumberToken
 {

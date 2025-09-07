@@ -1,10 +1,10 @@
-﻿namespace RpcGen;
-
-using Microsoft.CSharp;
+﻿using Microsoft.CSharp;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Globalization;
 using Xdr;
+
+namespace RpcGen;
 
 public class Generator(Specification spec)
 {
@@ -190,7 +190,7 @@ public class Generator(Specification spec)
         {
             IsEnum = true,
         };
-        _ = cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(System.SerializableAttribute).FullName!));
+        _ = cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(SerializableAttribute).FullName!));
 
         foreach ((var field, var value) in enumd.Body)
         {
@@ -214,7 +214,7 @@ public class Generator(Specification spec)
         {
             IsPartial = true,
         };
-        _ = cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(System.SerializableAttribute).FullName!));
+        _ = cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(SerializableAttribute).FullName!));
         _ = cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(XdrStructAttribute).FullName!));
 
         for (int i = 0; i < structd.Body.Count; i++)
@@ -236,7 +236,7 @@ public class Generator(Specification spec)
         {
             IsPartial = true,
         };
-        _ = cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(System.SerializableAttribute).FullName!));
+        _ = cls.CustomAttributes.Add(new CodeAttributeDeclaration(typeof(SerializableAttribute).FullName!));
         _ = cls.BaseTypes.Add(xdrUnionType);
 
         var ctor = new CodeConstructor

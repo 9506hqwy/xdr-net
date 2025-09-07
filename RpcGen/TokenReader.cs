@@ -186,7 +186,7 @@ public class TokenReader(Lexer lexer)
     {
         if (this.Current is T t && (condition is null || condition(t)))
         {
-            token = this.Expect<T>(condition);
+            token = this.Expect(condition);
             return true;
         }
 
@@ -196,11 +196,11 @@ public class TokenReader(Lexer lexer)
 
     private bool TryExpectSeparator(SeparatorType type, out SeparatorToken? token)
     {
-        return this.TryExpect<SeparatorToken>(out token, t => t.Type == type);
+        return this.TryExpect(out token, t => t.Type == type);
     }
 
     private bool TryExpectReserved(ReservedType type, out ReservedToken? token)
     {
-        return this.TryExpect<ReservedToken>(out token, t => t.Type == type);
+        return this.TryExpect(out token, t => t.Type == type);
     }
 }

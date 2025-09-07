@@ -19,7 +19,7 @@ public class Declaration(TypeSpecifier typeSpec, string identifier, bool optiona
         var typeSpec = TypeSpecifier.Take(reader);
         if (typeSpec.IsVoid)
         {
-            return new Declaration(typeSpec, Declaration.VoidIdentifier, false, null, false);
+            return new Declaration(typeSpec, VoidIdentifier, false, null, false);
         }
 
         var identifier = reader.ExpectIdentifier();

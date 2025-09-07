@@ -1,7 +1,7 @@
-﻿namespace RpcGen;
-
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
+
+namespace RpcGen;
 
 public class Lexer(ProtoReader reader)
 {
@@ -17,16 +17,16 @@ public class Lexer(ProtoReader reader)
     {
         while (this.reader.Peek() != -1)
         {
-            if (this.reader.StartsWith(Lexer.CommentStart))
+            if (this.reader.StartsWith(CommentStart))
             {
                 var position = this.reader.GetReadPosition();
-                this.reader.Skip(Lexer.CommentStart.Length);
+                this.reader.Skip(CommentStart.Length);
                 yield return this.GetCommentBlockToken(position);
             }
-            else if (this.reader.StartsWith(Lexer.CommentLine))
+            else if (this.reader.StartsWith(CommentLine))
             {
                 var position = this.reader.GetReadPosition();
-                this.reader.Skip(Lexer.CommentLine.Length);
+                this.reader.Skip(CommentLine.Length);
                 yield return this.GetCommentLineToken(position);
             }
             else if (Keyword.MatchWhitespace(this.reader, out var _))
@@ -99,7 +99,7 @@ public class Lexer(ProtoReader reader)
     {
         var value = new StringBuilder();
 
-        while (!this.reader.StartsWith(Lexer.CommentEnd))
+        while (!this.reader.StartsWith(CommentEnd))
         {
             if (this.reader.EndOfStream)
             {
@@ -107,13 +107,13 @@ public class Lexer(ProtoReader reader)
             }
 
             var ch = this.reader.Read();
-            if (ch != Lexer.EOS)
+            if (ch != EOS)
             {
                 _ = value.Append((char)ch);
             }
         }
 
-        this.reader.Skip(Lexer.CommentEnd.Length);
+        this.reader.Skip(CommentEnd.Length);
 
         return new CommentToken
         {
@@ -134,7 +134,7 @@ public class Lexer(ProtoReader reader)
             }
 
             var ch = this.reader.Read();
-            if (ch != Lexer.EOS)
+            if (ch != EOS)
             {
                 _ = value.Append((char)ch);
             }
@@ -174,7 +174,7 @@ public class Lexer(ProtoReader reader)
             }
 
             var ch = this.reader.Read();
-            if (ch != Lexer.EOS)
+            if (ch != EOS)
             {
                 _ = value.Append((char)ch);
             }
