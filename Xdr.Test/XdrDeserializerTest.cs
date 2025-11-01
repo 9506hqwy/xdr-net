@@ -17,12 +17,12 @@ public class XdrDeserializerTest
     {
         var bytes1 = new byte[] { 0x00, 0x00, 0x00, 0x00 };
         var v1 = XdrDeserializer.Deserialize<bool>(bytes1, out var rest1);
-        Assert.AreEqual(false, v1);
+        Assert.IsFalse((bool?)v1);
         Assert.IsFalse(rest1.Any());
 
         var bytes2 = new byte[] { 0x00, 0x00, 0x00, 0x01 };
         var v2 = XdrDeserializer.Deserialize<bool>(bytes2, out var rest2);
-        Assert.AreEqual(true, v2);
+        Assert.IsTrue((bool?)v2);
         Assert.IsFalse(rest2.Any());
     }
 
@@ -271,7 +271,7 @@ public class XdrDeserializerTest
     {
         var bytes1 = new byte[] { 0x00, 0x00, 0x00, 0x00 };
         var v1 = XdrDeserializer.Deserialize<XdrOption<int>>(bytes1, out var rest1);
-        Assert.AreEqual(null, v1);
+        Assert.IsNull(v1);
         Assert.IsFalse(rest1.Any());
 
         var bytes2 = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
@@ -310,32 +310,32 @@ public class XdrDeserializerTest
         var v1 = (UnionTest)XdrDeserializer.Deserialize<UnionTest>(bytes1, out var rest1);
         Assert.AreEqual(1, v1.Value);
         Assert.AreEqual(2, v1!.A!.Data);
-        Assert.AreEqual(null, v1.B);
-        Assert.AreEqual(null, v1.C);
+        Assert.IsNull(v1.B);
+        Assert.IsNull(v1.C);
         Assert.IsFalse(rest1.Any());
 
         var bytes2 = new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 };
         var v2 = (UnionTest)XdrDeserializer.Deserialize<UnionTest>(bytes2, out var rest2);
         Assert.AreEqual(2, v2.Value);
-        Assert.AreEqual(null, v2!.A);
+        Assert.IsNull(v2!.A);
         Assert.AreEqual(2L, v2.B!.Data);
-        Assert.AreEqual(null, v2.C);
+        Assert.IsNull(v2.C);
         Assert.IsFalse(rest2.Any());
 
         var bytes3 = new byte[] { 0x00, 0x00, 0x00, 0x03 };
         var v3 = (UnionTest)XdrDeserializer.Deserialize<UnionTest>(bytes3, out var rest3);
         Assert.AreEqual(3, v3.Value);
-        Assert.AreEqual(null, v3!.A);
-        Assert.AreEqual(null, v3.B);
+        Assert.IsNull(v3!.A);
+        Assert.IsNull(v3.B);
         Assert.AreEqual(XdrVoid.Data, v3.C!.Data);
         Assert.IsFalse(rest3.Any());
 
         var bytes4 = new byte[] { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03 };
         var v4 = (UnionTest)XdrDeserializer.Deserialize<UnionTest>(bytes4, out var rest4);
         Assert.AreEqual(4, v4.Value);
-        Assert.AreEqual(null, v4!.A);
+        Assert.IsNull(v4!.A);
         Assert.AreEqual(3L, v4.B!.Data);
-        Assert.AreEqual(null, v4.C);
+        Assert.IsNull(v4.C);
         Assert.IsFalse(rest4.Any());
     }
 
