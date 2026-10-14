@@ -1,0 +1,32 @@
+version: '3'
+
+tasks:
+  format:
+    cmds:
+      - dotnet format
+
+  debug-build:
+    cmds:
+      - dotnet build
+
+  release-build:
+    cmds:
+      - dotnet build -c Release
+
+  test:
+    cmds:
+      - dotnet test
+
+  doc-gen:
+    cmds:
+      - docfx doc/docfx.json
+
+  pkg-gen:
+    cmds:
+      - dotnet pack -o ./artifacts
+
+  sbom-gen:
+    cmds:
+      - mkdir -p artifacts
+      - find ./artifacts -name "*.sbom.json" -delete
+      - ./Tools/gen-sbom.sh -o ./artifacts

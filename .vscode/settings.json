@@ -1,5 +1,5 @@
 {
-    "dotnet.defaultSolution": "xdr-net.sln",
+    "dotnet.defaultSolution": "xdr-net.slnx",
     "editor.codeLens": false,
     "editor.formatOnPaste": false,
     "editor.formatOnSave": true,

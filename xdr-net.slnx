@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="RpcGen.Test/RpcGen.Test.csproj" />
+  <Project Path="RpcGen/RpcGen.csproj" />
+  <Project Path="Xdr.Test/Xdr.Test.csproj" />
+  <Project Path="Xdr/Xdr.csproj" />
+</Solution>
